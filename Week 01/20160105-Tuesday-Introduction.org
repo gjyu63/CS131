@@ -1,0 +1,18 @@
+* Lecture 01 Notes
+** D.E. Knuth and our algorithm
+*** Pascal and TeX
+*** McIlroy's Solution
+** Programming language types
+
+In this class we will partition programming languages into three types:
+1. Imperative languages
+2. Functional languages (declarative languages)
+3. Logic languages
+
+Thus, with these divisions in mind, we will cover five languages:
+1. Java
+2. Python
+3. Scheme
+4. ML
+5. Prolog
+
