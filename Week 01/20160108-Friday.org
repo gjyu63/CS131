@@ -1,0 +1,95 @@
+#+AUTHOR: Ryan Sharif
+#+EMAIL: rsharif@g.ucla.edu
+#+TITLE: January 9th 2016 - Discussion Notes
+* Introduction
+** Contact information
+Seunghyun Yoo
+shyoo1st@cs.ucla.edu
+
+Office hours will be held on Mondays and Wednesdays from 5:30 - 6:30 pm
+@ BH2432
+** Homework
+The first homework for this class is due January 14th.
+* OCaml Discussion
+** Basics
+*** add function
+let add x y = x + y ;;
+*** factiorial function
+let rec fact n =
+  if n <= 0 then 1
+  else n * fact (n - 1)
+;;
+*** operands
+There are separate operands for ints and reals:
+| int | float |
+| +   | +.    |
+| -   | -.    |
+| *   | *.    |
+| /   | /.    |
+*** square function
+#+BEGIN_SRC ml
+let square x = x * x ;;
+(* another way to define the same function*)
+let square = fun x -> x * x ;;
+
+(* one more way to define the same function  *)
+let square x =
+  match x with
+  | x -> x * x ;; 
+#+END_SRC 
+*** how many parameters does a function take
+Every function just takes one parameter by default; however,
+you can have a function take a tuple:
+#+BEGIN_SRC ml
+(* tuple way *)
+let add(x,y) = x + y ;;
+
+(* currying style *)
+let add x y = x + y ;;
+val add int -> int -> int = <fun>
+#+END_SRC
+*** conditions
+#+BEGIN_SRC ml
+let max a b = 
+  if a > b then a 
+  else b 
+;;
+
+let eval op v1 v2 =
+  match op with
+| "+" -> v1 + v2 
+| "-" -> v1 -v2  
+| _ -> failwith "undefined"
+#+END_SRC
+*** lists
+Lists have several properties:
+- immutable
+- homogeneous
+
+We may want to add items to the front of a list:
+use the :: operator
+
+We may also want to append items to the list:
+use the @ operator
+*** type definition
+To define a type:
+#+BEGIN_SRC ml
+type name = typedef;;
+type ' name = typedef -polymorphic;;
+#+END_SRC
+
+For example, we can provide a binary-tree example:
+#+BEGIN_SRC ml
+type binary-tree = Leaf of int
+  | Tree 
+  | Tree of binary tree * binary-tree;;
+#+END_SRC
+
+#+BEGIN_SRC ml
+(* print tree *)
+let print_type x = 
+ match x with
+ | Tree -> "Tree"
+ | Leaf -> "Leaf" 
+#+END_SRC
+** Homework
