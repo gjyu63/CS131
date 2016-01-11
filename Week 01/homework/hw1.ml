@@ -10,10 +10,16 @@ let equal_sets a b =
   if (subset a b) && (subset b a) then true else false;;
 
 let set_union a b =
-  let sorted_combined_list in
-  
-;;  
-
+  let sorted_list = b in
+  let rec add_to_list c d =
+    match a with
+    | [] -> []
+    | [x] -> c :: sorted_list
+    | hd :: tl ->
+      if true then add_to_list tl d
+      else hd :: sorted_list
+  in add_to_list a b
+;;
   
 (* tests for subset function  *)
 let my_subset_test_0 = subset [] [1;2;3;4;5];; (* true *)
