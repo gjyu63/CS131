@@ -1,0 +1,142 @@
+#+TITLE: Lecture Notes
+#+AUTHOR: Ryan Sharif
+#+LaTeX_CLASS_OPTIONS: [letter,twoside,twocolumn]
+
+* Fun vs. Function
+  There are two keywords that we can use in OCaml: /fun/ and 
+  /function/, e.g.,
+  #+BEGIN_SRC ml
+  fun x -> x + 1;;
+  function x -> x + 1;;
+  #+END_SRC
+
+  We use /fun/ for currying, whereas we use /function/ for pattern
+  matching.
+
+  #+BEGIN_SRC ml
+  function
+| [] -> 12
+| [27] -> 13
+| _ -> 0
+  #+END_SRC
+
+  Professor Eggert emphasises that we should keep these patterns
+  in mind.
+
+* Defining your own types
+
+  A particular kind of type definition that we'll use looks similar
+  to pattern matching, which is called a /discriminated union/:
+
+  #+BEGIN_SRC ml
+  type mytype = 
+| Foo
+| Bar of int    
+| Baz of string * int
+  #+END_SRC
+
+  This type of discriminated union concept exists in C++ as a
+  non-discriminated union:
+
+#+BEGIN_SRC C++
+union u {
+ char foo;
+ int bar;
+ struct {char *s; int i;} baz;
+}
+#+END_SRC
+
+  To create a value of the above mentioned discriminated union type,
+  we are given a constructor automatically by OCaml, thus:
+
+  #+BEGIN_SRC ml
+  Foo;;
+  Bar 12;;
+  Baz("abc", 19);;
+  #+END_SRC
+
+  Let's say that V is of type mytype:
+
+  #+BEGIN_SRC ml
+  match v with
+  | Foo -> 0 
+  | Bar x -> x
+  | Baz(_,y) -> y
+  #+END_SRC
+  
+  Parameterized types
+  #+BEGIN_SRC ml
+  type 'a option =
+  | Some of 'a
+  | None
+  #+END_SRC
+  
+** defining our own list with types
+  #+BEGIN_SRC ml
+  type 'a llist = 
+| Empty
+| Cons of 'a * 'a llist
+
+(* we can write our own list* )
+let len =
+  function
+  | Empty -> 0
+  | Cons(_,t) -> 1 + len t
+  #+END_SRC
+
+** Annotating types ourselves
+We can explicitly spell out our own types:
+
+#+BEGIN_SRC ml
+let inc x:int = x + 1;;
+#+END_SRC
+
+* Syntax
+
+  The classic definition of syntax: we are talking about the form of
+  something independent of meaning. This notion of separating form
+  from meaning is borrowed from linguistics. 
+  
+  In programming languages, ambiguity is typically considered a bad
+  thing. We strive to avoid ambiguity in programming languages. But
+  we'll take for granted that /syntax/ is the /easy/ part of
+  programming. 
+
+** Reasons to prefer one syntax over another
+
+Some reasons for prefering one syntax to another:
+- close to natural language
+- concise
+  - writable
+  - readable
+  - similar to common practice
+  - simple rules (specfication/grammar is small and easy to learn.
+	Furthermore, it is easy to implement)
+  - unambiguous
+  - redundant (in C, parantheses are redundant)
+
+** Syntax from the bottom up
+
+We parse source code syntax from the bottom up:
+1. bytes
+2. characters
+3. tokens (gluing characters together) [easy to recognize quickly]
+   1. There are things that are not tokens, e.g.,
+      #+BEGIN_SRC c
+      a + d /* Hello! I'm a comment */ + e
+      #+END_SRC
+4. Grammars
+   1. Formal languages, where we have a finite set of tokens, i.e.,
+      terminal symbols.
+   2. We'll define a sentence as a finite sequence of tokens
+   3. Finally, a language is a set of sentences
+      1. But how do we determine whether a token sequence is a
+	 sentence?
+
+We have the issue of indentifiers vs. keywords:
+#+BEGIN_SRC c
+int int = 4; /* Not allowed */
+#+END_SRC
+
+This issue makes extension difficult because old identifiers may
+become keywords in the future.
