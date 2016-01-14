@@ -1,0 +1,73 @@
+#+AUTHOR: Ryan Sharif
+#+TITLE: Languages & Syntax
+#+OPTIONS: toc:nil
+#+LaTeX_CLASS_OPTIONS: [letter,twoside,twocolumn]
+
+* Reading for Next week
+Read § 1-9, 11, 10 (maybe)
+
+* Languages & Syntax: Grammars
+
+** History
+The first programming language, FORTRAN, tried using only English and
+examples. Thus, it was ambiguous and incomplete.  Further still, there
+were parts of the manual that were contradictory.
+
+** BNF: Backus-Naur Form
+BNF came out of FORTRAN; it is an apology for FORTRAN. Following the
+research from Linguists, we got /type 3/, /type 2/, and /type 1/, 
+or regular, context-free, and context sensitive grammars, respectively.
+
+** Derivation
+One way to write a derivation is to start at the start symbol of a
+grammar and at each step of the derivation, you specify which rule you
+will apply to the next step.
+
+Its really cheap to check a proof. Even the dumbest algorithm will be
+$O(n^3)$.  What is really expensive is to generate a proof, which
+is generally $O(2^n)$.
+
+** Notations for grammars
+There isn't an agreed upon convention for grammars. Some
+differences include $\rightarrow$ vs. $::=$.
+
+An email message is a string of bytes that contains header
+bytes and an empty line, followed by an abritrary body full
+of bytes. The message ID has the following type of grammar:
+/msg-id = "<" word *("." word) "@" atom * ("." atom) ">" /
+This grammar is written in EBNF form.
+
+** EBNF ISO
+http://www.cl.cam.ac.uk/~mgk25/iso-ebnf.html
+
+Allowance for =terminal= or ~'terminal'~, repetition could be done
+~*repetition~ or ~{repetition}~, grouping, except ( ~A-B~ ),
+concatenation ~,~, or ~|~ , defn ~=~, and these operators are in
+decreasing precedence. Here are some of their rules
+=syntax = syntax rule, {syntax rule}=
+
+** Big grammars: databases
+Instead of writing a grammar as a text, you write the grammar as a
+diagram. Here is a grammar for /scheme/ using a syntax diagram:
+
+/Look in the textbook./
+
+* Grammar problems
+
+** Standard mistakes
+
+*** non-terminal is used but not defined
+
+You have a rule with it in on the right hand side but no such grammar
+exists where it is on the left hand side. \\
+S \rightarrow T \\
+S \rightarrow a \\ 
+T \rightarrow UVb 
+
+*** non-terminals defined but not used
+
+You can have rules where you never use any of them
+
+*** infinite loops
+S \rightarrow X \\
+X \rightarrow Xa
