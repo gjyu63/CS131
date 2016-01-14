@@ -10,15 +10,12 @@ let equal_sets a b =
   if (subset a b) && (subset b a) then true else false;;
 
 let set_union a b =
-  let sorted_list = b in
-  let rec add_to_list c d =
-    match a with
-    | [] -> []
-    | [x] -> c :: sorted_list
-    | hd :: tl ->
-      if true then add_to_list tl d
-      else hd :: sorted_list
-  in add_to_list a b
+let combined_lish = [] in
+(* sort list a *)
+let sorted_a = [] in true
+(* sort list b *)
+
+(* add element to list if not in combined_list *)
 ;;
   
 (* tests for subset function  *)
@@ -41,10 +38,10 @@ let my_equal_sets_test_7 = not (equal_sets [1] []);; (* false *)
 let my_equal_sets_test_8 = not (equal_sets [] [1]);; (* false *)
 
 (* tests for set_union function *)
-let my_set_union_test1 = set_union [] [];; (* [] *)
-let my_set_union_test2 = set_union [1] [];; (* [1] *)
-let my_set_union_test3 = set_union [] [1];; (* [1] *)
-let my_set_union_test4 = set_union [1] [1];; (* [1] *)
-let my_set_union_test5 = set_union [1;2;3] [1];; (* [1;2;3] *)
-let my_set_union_test6 = set_union [1;2;3;4;5;6] [1;2;6];; (* [1;2;3;4;5;6] *)
-let my_set_union_test7 = set_union [] [1;2;3;4;5;6];; (* [1;2;3;4;5;6]  *)
+(* let my_set_union_test1 = set_union [] [];; (\* [] *\) *)
+(* let my_set_union_test2 = set_union [1] [];; (\* [1] *\) *)
+(* let my_set_union_test3 = set_union [] [1];; (\* [1] *\) *)
+(* let my_set_union_test4 = set_union [1] [1];; (\* [1] *\) *)
+(* let my_set_union_test5 = set_union [1;2;3] [1];; (\* [1;2;3] *\) *)
+(* let my_set_union_test6 = set_union [1;2;3;4;5;6] [1;2;6];; (\* [1;2;3;4;5;6] *\) *)
+(* let my_set_union_test7 = set_union [] [1;2;3;4;5;6];; (\* [1;2;3;4;5;6]  *\) *)
