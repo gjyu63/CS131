@@ -3,3 +3,4 @@
 
 # ignore tex files for now
 *.tex
+*.pdf
