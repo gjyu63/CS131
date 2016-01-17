@@ -42,21 +42,25 @@ let rec set_diff a b =
 
 (* returns the computed fixed point for f with respect to x *)
 let rec computed_fixed_point eq f x =
-  if eq (f x) x then x else computed_fixed_point eq f (f x)
+  if eq (f x) x then x
+  else computed_fixed_point eq f (f x)
 ;;
 
 (* returns the computed periodic point for f with period p and 
    with respect to x*)
 let rec computed_periodic_point eq f p x =
-  (* function for calling f, n times *)
-  let rec call_p_times g q y =
-    if (q = 1) then y else call_p_times g (q - 1) (g y)
-     (* lets save cpu cycles by storing our current x *)
-  in let z = call_p_times f p x in
-     if eq (z x) x then x
-     else computed_periodic_point eq f z
+  let rec call_f g n y =
+    if n <= 1 then y else call_f g (n - 1) (g y)
+  in let new_x = call_f f p x in 
+     if eq new_x x then x
+     else computed_periodic_point eq f p new_x
 ;;
 
+(* filter_blind_alleys *)
+let filter_blind_alleys g =
+  true
+;;
+    
 (* ------------------------------------------------------------------------- *)
 (* ------------------------------ tests ------------------------------------ *) 
                         
@@ -118,4 +122,4 @@ let my_computed_fixed_point_test2 = computed_fixed_point
 (* tests for computed_periodic_point *)
 
 let computed_periodic_point_test0 =
-  computed_periodic_point (=) (fun x -> x / 2) 0 (-1);;
+  computed_periodic_point (=) (fun x -> x / 9) 2 (-1);;
