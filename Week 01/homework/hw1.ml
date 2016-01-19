@@ -56,11 +56,58 @@ let rec computed_periodic_point eq f p x =
      else computed_periodic_point eq f p new_x
 ;;
 
+(* Type defintion for grammars *)
+type ('nonterminal, 'terminal) symbol =
+  | N of 'nonterminal
+  | T of 'terminal
+;;
+  
 (* filter_blind_alleys *)
 let filter_blind_alleys g =
   true
 ;;
-    
+
+(* test functions *)  
+let rec get_terminal_symbols list =
+  let set_symbols = [] in
+  match list with
+  | [] -> []
+  | hd :: tl ->
+     match hd with
+     | (_, a) ->
+        if List.mem set_symbols a then get_terminal_symbols tl
+        else a :: get_terminal_symbols tl
+;;
+
+(* function for extracting rules in a grammar *)
+let get_rules grammar =
+  match grammar with
+  | (_, a) -> a
+;;
+
+(* function for checking if termination *) 
+let rec is_terminal rule =
+  match rule with
+  | T t -> true
+  | N _ -> false
+;;
+
+let rec get_rules_with_terminals rules =
+  match rules with 
+  | [] -> []
+  | hd :: tl ->
+     match hd with 
+     | n, list ->
+        let rec add_all_terminals l =
+          match l with
+          | [] -> []
+          | h2 :: t2 ->
+             if is_terminal h2
+                          then n :: add_all_terminals t2
+                        else add_all_terminals t2
+        in add_all_terminals list :: get_rules_with_terminals tl
+;;
+  
 (* ------------------------------------------------------------------------- *)
 (* ------------------------------ tests ------------------------------------ *) 
                         
