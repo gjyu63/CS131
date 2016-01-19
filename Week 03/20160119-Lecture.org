@@ -1,0 +1,83 @@
+#+AUTHOR: Ryan Sharif
+#+TITLE: Lecture 05
+#+LaTeX_CLASS_OPTIONS: [letter,twoside,twocolumn]
+#+oPTIONS: toc:nil
+
+* Domain specific languages
+** DSP
+You  can  write  a  domain  specific language  that  omits  stuff  not
+necessary for  a particular  domain and then  leverage the  grammar to
+make it easier to work with.
+** BNF
+Eggert argues that  BNF is a domain specific  language, specifically a
+domain for parsing.
+* The problem of ambiguity
+Ambiguity  arises  when we  have  a  grammar  where something  can  be
+interpreted in multiple ways. Say we have a grammar:
+
+E \rightarrow E + E
+
+E \rightarrow E * E
+
+E \rightarrow (E)
+
+** Fixing ambiguous grammars
+Generally, when we want to  remove ambiguity, we'll need to complicate
+the grammar to  reject the parses that we don't  like. For example, we
+could change our grammar above to:
+
+E \rightarrow E + E
+
+E \rightarrow F \times F
+
+F \rightarrow (E)
+
+E \rightarrow ID
+
+E \rightarrow F
+
+With this  grammar, we've  solved the problem  of precedence.   But we
+still have a problem with associativity.
+
+** C Ambiguity
+
+We  looked at  several  ways to  add  and remove  ambiguity  to the  C
+grammar.   The   problem  with  introducing  more   rules  to  resolve
+ambiguities, we end up creating parse trees that are longer/larger. We
+differentiate between  these two parses  by saying that  the ambiguous
+tree is called an /abstract parse tree/, and the non-ambiguous tree is
+called a /concrete parse tree/.
+* Overall problem of our second homework assignment
+** Parsing
+/parsing/: recognizing whether a token sequence is a sentence.
+
+The simplest  type of parser  that can parse grammars  efficiently are
+/regular expressions/, such as ~(a +* b)+ c~.
+
+*** Pushdown Automaton
+A  pushdown automaton  is a  finite-state machine  plus a  stack.  Our
+theory says that  a pushdown automaton can  recognize any context-free
+grammar.
+
+*** Homework 2 parsing
+/parsing = recursion, concatenation, and disjunction (the hard part)./
+
+We'll need  to write  an acceptor  function that will  tell you  if it
+likes a string of tokens. To  implement disjunction, we take the input
+tokens and if we have three  possibilities, we call a matcher function
+and glue eveything  together if our matcher  returns /true/ otherwise,
+we  try the  next possibility.   We can  solve concatenation  by using
+acceptors.
+* Expression semantics
+In C, we can do the following: ~a  = b = 2~, which is equivalent to ~a
+= ( b = 2 )~. But suppose that we have the following: ~( a = 1 ) + ( a
+= 2 )~. This behavior is _undefined_.
+* Translation
+When a  compiler reads  in a  file, it  tokenizes the  input (lexing),
+which are represented as numbers.  Associated with some tokens will be
+extra  information,  in  particular,  identifiers such  as  ~main~  or
+~num~. This  produces a parse tree.  In a typical compiler,  after the
+parse tree  is generated, it will  type check the program,  then check
+identifiers, at which point it  will generate intermediate code, which
+is sent to a backend code generator for differernt architectures. This
+will generate a file that an assembler can put together.
