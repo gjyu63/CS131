@@ -1,0 +1,131 @@
+			  ____________________
+
+			   HOMEWORK 1 WRITEUP
+
+			     ______________
+			  ____________________
+
+
+Table of Contents
+_________________
+
+1 Subset
+2 Equal Sets
+3 Set Union
+4 Set intersection
+5 Set difference
+6 Computed Fixed Point
+7 Computed Periodic Point
+8 Filter Blind Alleys
+
+
+
+
+
+1 Subset
+========
+
+  In standard set theory, a set A is a subset of B if for every element
+  alpha in A, alpha is an element in B. Thus, for this function we take
+  in a set, a, and then check to see if every element in the set can be
+  found in b. We use the /List.mem/ function in order to see if the
+  element we are currently looking at can indeed be found in b. Finally,
+  since we know that the empty set is a subset of every set, we return
+  true for empty sets.
+
+
+2 Equal Sets
+============
+
+  In standard set theory, a set A and B are considered equal if and only
+  if A is a subset of B, and similarly, B is a subset of A. Thus we can
+  leverage the previous function to see if the two sets we are checking
+  are subsets of one another.  If they are, then we return true,
+  otherwise we return false.
+
+
+3 Set Union
+===========
+
+  In standard set theory, the union of two sets is the combination of a
+  set A and B.  In otherwords, if an element alpha is in A or B, then
+  alpha is in the union of A and B. We can accomplish this by first
+  creating a list that contains everything in B:
+  ,----
+  | let union = b
+  `----
+  and then matching a with three possible cases: (i) a is empty, (ii) a
+  has one item, (iii) a has more than one element. For the first case we
+  can simply return our union variable.  For the second case, we can
+  check to make sure we aren't adding in a duplicate item to our set.
+  Finally, if there are more than one elements in A, we can recursively
+  cycle through A, adding any elements that are not already in B.
+
+
+4 Set intersection
+==================
+
+  In standard set theory, the intersection of two sets is the set that
+  contains just those elements that are found in A and B.  For this
+  function, we only need to cycle through the elements in A, since if an
+  element, alpha, is not in A, then it should not be in the intersection
+  of A and B.  Thus we again have three possible cases, (i) A is empty,
+  (ii) A contains one item, (iii) A contains more than one item. In the
+  first case, if A is empty, then then function returns an empty set. In
+  the second case, the function returns the empty set if A's element is
+  not in B, otherwise it returns a set with one item. Finally, if there
+  are more than one items in A, each item is checked to make sure it is
+  in B, if so, it is added to the list we return, otherwise we continue
+  checking through each element in A until we are done.  This function
+  does not check to make sure that our returned list does not contain
+  duplicates, since B may contain duplicates.
+
+
+5 Set difference
+================
+
+  In standard set theory, the difference of a set A and B, is the set A
+  with any element that belongs to B removed. Thus, we can build up a
+  list of items in A by checking to see if each element in A belongs to
+  B, if it does, then we do not add it to our list, if it does not we
+  add it to our list. This function does not check to make sure there
+  are duplicates in A, for time efficiency.
+
+
+6 Computed Fixed Point
+======================
+
+  This is a fairly simple function. We simple check to see if the value
+  returned by a predicate /eq/ on the operands (f x) and x is true. If
+  it is, we return x, otherwise we recursively continue.
+
+
+7 Computed Periodic Point
+=========================
+
+  This is a more challenging function. Using recursion, we call the
+  function with four arguments, a predicate that returns true or false,
+  a function, an argument p, which tells us how many times to apply f
+  before checking its value again, and then a starting value x. We pass
+  our predicate the value of f applied p times and check if that value
+  is equal to x, if not we repeat until we find such a value.
+
+
+8 Filter Blind Alleys
+=====================
+
+  I was not able to complete this function. Although I have a general
+  strategy for how to implement the function, I ran into several issues.
+  First lets outline the general strategy for this function. The first
+  thing we'd need to do, is find out which Expression directly lead to a
+  terminal symbol.  Once we've found those expresssions, we can cycle
+  through our grammar checking to see if the current expression we are
+  looking at can terminate by following its right hand side. If that is
+  true, continue through the rest of the rules in the current list until
+  we've checked to make sure all RHS end in termination. If they do, add
+  it to a list of good rules, if not we want to check the rule using our
+  /computed periodic point function/ to see if it ever terminates, if
+  not, the rule is a blind ally and we filter it out of our list. The
+  biggest challenge that I faced in implementing this function was
+  understanding how the data structure is organized conceptually and
+  then figuring out how to get OCaml to cycle through the grammar.
