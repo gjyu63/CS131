@@ -1,0 +1,109 @@
+#+AUTHOR: Ryan Sharif
+#+TITLE: Competing Philosophies: Tools vs. IDEs
+#+LATEX_HEADER: \usepackage{amsthm}
+#+LATEX_HEADER: \usepackage{mathtools}
+#+LATEX_HEADER: \usepackage{tikz}
+
+#+LaTeX_HEADER: \usepackage[T1]{fontenc}
+#+LaTeX_HEADER: \usepackage{mathpazo}
+#+LaTeX_HEADER: \linespread{1.05}
+#+LaTeX_HEADER: \usepackage[scaled]{helvet}
+#+LaTeX_HEADER: \usepackage{courier}
+#+LATEX_HEADER: \usepackage{listings}
+#+LATEX_HEADER: \usetikzlibrary{positioning,calc}
+#+LaTeX_CLASS_OPTIONS: [letter,twoside,twocolumn]
+#+OPTIONS: toc:nil
+
+* Competing philosophies
+We've  talked about  competing philosophies  in software  development,
+e.g., *Software tools (Unix) vs. IDE (Small Talk)*
+
+Now let's consider another  pair of competing philosophies: *Compilers
+vs. Interpreters*
+
+** Compilers
+The compiler will look at source code  and try to make our code run as
+fast as  it can,  i.e., optimization.  This means  that we  get faster
+execution.
+
+** Interpreters
+The Python interpreter builds an internal model of the python, such as
+a  parse tree  or  byte code  representation, which  is  close to  the
+original program.  Because of this fact,  the output will be  run in a
+Python interpreter, that was originally  written itself in C.  Because
+the interpeter  is working  on something closer  to the  actual source
+code, it can give us  detailed error reports. Furthermore, since there
+is  little  translation  needed,  it  is faster  to  start  running  a
+programming.
+** JIT Just in Time Compiling
+The basic idea of  JIT is to have an interpreter  that also contains a
+compiler. Java  implements this  model by keeping  track of  how often
+bytecodes are  being used. The  Java interpreter will  compile machine
+code for hotspots  in your code.  Thus, even though  your program will
+begin with  a class  bytecode, during runtime  it will  compile native
+bytecode. One downside to this  implementation is the memory footprint
+of  the compiler,  hence, it  is  cumbersome to  implement in  onboard
+devices.
+** Performance
+*** Profiles
+
+A CPU profiler takes every instruction that it is given and counts how
+many times that instruction was executed, producing a histogram, which
+shows us hotspots in our programs.  The historgram can also tell us if
+there is code that is not executing, which may indicate that our tests
+are not thoroughly testing our code.
+
+We can build these profilers  by inserting interupts into our programs
+and  performing  statistical analysis  of  CPU  instructions. Much  of
+profiling is finding out  which part of the stack is  to blame for the
+slowest part of the program. Fancier profiles includes /gprof/.
+
+But CPU time isn't the only resource  to worry about. We need to worry
+about how much RAM is being used, such as /valgrind/.
+* Tools vs. IDEs
+** Dynamic linking
+One advantage  of the IDE philosophy  is that if your  program has one
+bug or  necessary change, we  need to  recompile every step  below the
+change.   We  can  emulate  this  philosophy  in  the  software  tools
+philosophy  by using  /dynamic  linking/. Another  benefit to  dynamic
+linking  is that  we can  have two  programs dynamically  link to  one
+dynamic library, which frees resources  in RAM.  Furthermore, any bugs
+that exist  in a dynamically  linked library,  can be updated  all the
+time.
+
+** Problems for Dynamic linking
+How do we  implement type checking with dynamic  linking? One solution
+is /name mangling/. The idea is take the names that the user wrote and
+change them  in the  ~.o~ files: append  becomes ~append$int$int$int~.
+But  for name  mangling  to  work, everyone  must  agree  on the  name
+mangling convention.
+
+* Types
+** Definition
+/Types/ are a set of values.  A programming language that takes this
+approach to its logical conclusion is /SETL/. Still, a type is also a
+representation for those values. Our book defines a type as a set of
+values and operations on those values.
+** Why types?
+There are advantages for using types:
+
+- storage efficieny
+- behavior prediction
+- catch stupid mistakes
+- overloading
+
+We can implement types by annotating our code or having the computer
+perform inference.
+** Static vs. dynamic type checking
+Static type checking has our compiler ensure safety and speed by
+checking source code at the beginning of compilation. Dynamic type
+checking is implemented in languages like /sh, awk, Python,
+Javascript, etc.../
+** Abstract vs. exposed types
+Those invested in object oriented programming value a type if it tells
+you the set of values and set of operations something has. Those who
+believe in exposed types value types because they tell you its set of
+values and the way the values are represented, e.g., as a byte array
+or a list of lists.
+
+
