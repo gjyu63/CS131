@@ -15,7 +15,7 @@ let rec set_union a b =
   | [] -> union
   | [x] -> if List.mem union x then union else x :: union
   | hd :: tl ->
-     if List.mem union hd then set_union tl b else hd :: set_union tl b
+     if List.mem union hd then set_union tl union else hd :: set_union tl union
 ;;
 
 let rec set_intersection a b =
