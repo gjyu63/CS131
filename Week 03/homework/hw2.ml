@@ -25,7 +25,7 @@ let rec get_lhs =
 ;;
 
 (* collect rules *)
-let rec collect_rhs lhs = 
+let rec collect_rhs r lhs = 
      (* helper for extracting rule *)
      let get_rule = function
        | (a, b) -> b in
@@ -35,12 +35,15 @@ let rec collect_rhs lhs =
      (* helper for matching left side*)
      let matches_lhs a b = (a = b) in
 
-     function 
+     match r with
      | [] -> []
      | hd :: tl ->
-        let rules = collect_rhs lhs tl in
+        let rules = collect_rhs tl lhs in
         if (matches_lhs lhs (get_category hd)) then (get_rule hd) :: rules
         else rules 
 ;;  
-(* convert grammar function *)
 
+(* convert grammar function *)
+let convert_grammar = function
+  | (a, b) -> (a, collect_rhs b)
+;;
