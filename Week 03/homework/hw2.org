@@ -1,6 +1,7 @@
-#+AUTHOR: Ryan Sharif
+#+AUTHOR: 
 #+TITLE: CS131: Homework 2, Naive parsing of context free grammars
 
+* Grammar converter
 #+BEGIN_SRC ocaml :tangle hw2.ml
 (* get left hand sides helper function *)
 let rec get_lhs =
@@ -57,6 +58,8 @@ let convert_grammar = function
   | (a, b) -> (a, collect_rhs b)
 ;;
 #+END_SRC
+
+* Matcher
 
 With the first function written, we can turn our attention to the main part
 of the assignment, writing the /parse_prefix/ function. This function will

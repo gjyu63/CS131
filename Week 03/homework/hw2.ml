@@ -1,3 +1,4 @@
+
 (* get left hand sides helper function *)
 let rec get_lhs =
   (* function that checks for duplicate *)
@@ -41,7 +42,7 @@ let rec collect_rhs r lhs =
         let rules = collect_rhs tl lhs in
         if (matches_lhs lhs (get_category hd)) then (get_rule hd) :: rules
         else rules 
-;;  
+;;
 
 (* convert grammar function *)
 let convert_grammar = function
