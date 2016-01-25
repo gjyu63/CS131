@@ -64,3 +64,38 @@ let convert_grammar = function
 With the first function written, we can turn our attention to the main part
 of the assignment, writing the /parse_prefix/ function. This function will
 return a matcher for the argument /gram/.
+
+** Prefix checker function
+Our matcher will require a function that will check to see if a prefix
+is legal, i.e., given a string $xy$, our prefix checker function
+will tell us if $x$ is a valid prefix. There may be symbols left over
+in the prefix, and we'll need some way of carrying those symbols over
+to the suffix.
+
+** Retrieving prefixes and suffixes
+Before we can write a function to check prefixes, we'll need a
+function that will retrieve all the possible prefixes we can generate
+from an input string. Furthermore, given any prefix, we'll need its
+corresponding suffix too. Thus, we'll need a function that splits a
+list of terminal symbols into a list of prefixes and
+suffixes. Finally, there are many ways to implement this function;
+however, we should make sure to grab longer prefixes before we grab
+shorter ones.
+
+Let's write the function. It should take in a list of terminal symbols
+and return a list of lists containing prefixes and suffixes. We'll
+need to know how long a list is before we can split it, so we'll need
+a helper function that walks through the list and gets its length.
+
+#+BEGIN_SRC ocaml :tangle hw2.ml
+let rec get_list_length =
+  let list_length = get_list_length in
+  function
+  | [] -> 0
+  | hd :: tl -> 1 + list_length tl
+;;
+#+END_SRC
+
+With that helper function completed, we need to write a function that
+takes a list and an integer, and splits that list recursively into
+prefixes and suffixes
