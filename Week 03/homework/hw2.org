@@ -82,6 +82,7 @@ suffixes. Finally, there are many ways to implement this function;
 however, we should make sure to grab longer prefixes before we grab
 shorter ones.
 
+*** List length
 Let's write the function. It should take in a list of terminal symbols
 and return a list of lists containing prefixes and suffixes. We'll
 need to know how long a list is before we can split it, so we'll need
@@ -96,6 +97,22 @@ let rec get_list_length =
 ;;
 #+END_SRC
 
+*** Split a list
 With that helper function completed, we need to write a function that
 takes a list and an integer, and splits that list recursively into
-prefixes and suffixes
+prefixes. Note here that we don't care about lists less than size 2,
+since we want at least one item in the prefix.
+
+#+BEGIN_SRC ocaml :tangle hw2.ml
+  let rec get_prefixes n list =
+    let rec split m l =
+      let prefix =
+        split in
+      match l with
+      | [] -> []
+      | hd :: tl ->
+         if ((m - 1) < 1) then []
+         else hd :: prefix (m - 1) tl
+    in if n < 2 then [] else split n list :: get_prefixes (n - 1) list
+  ;;
+#+END_SRC
