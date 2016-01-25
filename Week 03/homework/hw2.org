@@ -1,6 +1,5 @@
 #+AUTHOR: 
 #+TITLE: CS131: Homework 2, Naive parsing of context free grammars
-
 * Grammar converter
 #+BEGIN_SRC ocaml :tangle hw2.ml
 (* get left hand sides helper function *)
@@ -61,26 +60,27 @@ let convert_grammar = function
 
 * Matcher
 
-With the first function written, we can turn our attention to the main part
-of the assignment, writing the /parse_prefix/ function. This function will
-return a matcher for the argument /gram/.
+  With the  first function written, we  can turn our attention  to the
+  main   part   of   the  assignment,   writing   the   /parse_prefix/
+  function.  This function  will  return a  matcher  for the  argument
+  /gram/.
 
 ** Prefix checker function
-Our matcher will require a function that will check to see if a prefix
-is legal, i.e., given a string $xy$, our prefix checker function
-will tell us if $x$ is a valid prefix. There may be symbols left over
-in the prefix, and we'll need some way of carrying those symbols over
-to the suffix.
+   Our matcher  will require a  function that will  check to see  if a
+   prefix  is legal,  i.e., given  a string  $xy$, our  prefix checker
+   function  will tell  us if  $x$  is a  valid prefix.  There may  be
+   symbols  left over  in  the  prefix, and  we'll  need  some way  of
+   carrying those symbols over to the suffix.
 
 ** Retrieving prefixes and suffixes
-Before we can write a function to check prefixes, we'll need a
-function that will retrieve all the possible prefixes we can generate
-from an input string. Furthermore, given any prefix, we'll need its
-corresponding suffix too. Thus, we'll need a function that splits a
-list of terminal symbols into a list of prefixes and
-suffixes. Finally, there are many ways to implement this function;
-however, we should make sure to grab longer prefixes before we grab
-shorter ones.
+   Before we  can write  a function  to check  prefixes, we'll  need a
+   function  that  will retrieve  all  the  possible prefixes  we  can
+   generate from an input string. Furthermore, given any prefix, we'll
+   need its corresponding suffix too. Thus, we'll need a function that
+   splits  a list  of terminal  symbols into  a list  of prefixes  and
+   suffixes. Finally, there are many  ways to implement this function;
+   however, we should make sure to grab longer prefixes before we grab
+   shorter ones.
 
 *** List length
 Let's write the function. It should take in a list of terminal symbols
@@ -116,3 +116,27 @@ since we want at least one item in the prefix.
     in if n < 2 then [] else split n list :: get_prefixes (n - 1) list
   ;;
 #+END_SRC
+
+*** Splitting a fragment
+
+We now turn to combining the last two functions so that we can take
+a fragment and output a list of prefixes that need to be checked.
+The function will take in a fragment, which is a list of terminal
+symbols, and return a list of prefixes.
+
+#+BEGIN_SRC ocaml :tangle hw2.ml
+  let split list =
+    get_prefixes (get_list_length list) list
+  ;;
+#+END_SRC
+
+*** Getting a terminal's non-terminal
+
+    Next, we need a function that will tell us which non-terminal
+    symbol leads directly to a terminal, i.e., if we pass the function
+    a "1", it will return "Num". Here we can anticipate a problem for
+    our grammar because some non-terminals produce a right-hand-side
+    that contains terminals, as in the example where ``Term'' goes to
+    ``( Expr )''. In that case when we seek a derivation, we will
+    look once for the left paranthesis, and once again when we look
+    for the right paranthesis. 
