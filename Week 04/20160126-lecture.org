@@ -1,0 +1,99 @@
+#+AUTHOR: Ryan Sharif
+#+TITLE: Types
+#+LATEX_HEADER: \usepackage{amsthm}
+#+LATEX_HEADER: \usepackage{mathtools}
+#+LATEX_HEADER: \usepackage{tikz}
+
+#+LaTeX_HEADER: \usepackage[T1]{fontenc}
+#+LaTeX_HEADER: \usepackage{mathpazo}
+#+LaTeX_HEADER: \linespread{1.05}
+#+LaTeX_HEADER: \usepackage[scaled]{helvet}
+#+LaTeX_HEADER: \usepackage{courier}
+#+LATEX_HEADER: \usepackage{listings}
+#+LATEX_HEADER: \usetikzlibrary{positioning,calc}
+#+LaTeX_CLASS_OPTIONS: [letter,twoside,twocolumn]
+#+OPTIONS: toc:nil
+
+* Types continued...
+
+** Static vs. dynamic checking
+During our last lecture we discussed static vs. dynamic type checking.
+With /static type checking/ we look at a program before it runs. With
+static type checking we try to predict values.
+
+** Type equivalence
+There are typically two ways of looking at whether two values are of
+the same type: /structural equivalence/,[fn:1] and
+/name equivalence/.[fn:2]
+
+*** Example of structural equivalence
+C typically allows us two define two type definitions, yet will still
+consider them to be the same type[fn:3]:
+#+BEGIN_SRC c
+  typedef unsigned size_t;
+  typedef unsigned vid_t;
+
+  size_t x;
+  vid_t *y;
+
+  y = &x;
+#+END_SRC
+*** Example of name equivalence
+C does not always use structural equivalence. Suppose you have two
+~structs~ that have a different name but the same internal structure.
+C does not consider these two structs to be of the same type.
+
+** Type compatability
+*** Subtypes
+We consider the case of when one type is a subtype of another: 
+is ~short~ $\subseteq$ ~int~?[fn:4] Consider the following
+faulty code:
+#+BEGIN_SRC c
+  short s;
+  int *p = &s;
+#+END_SRC
+Since we have found a counter example[fn:5] of when a ~short~ cannot be
+substituted with an ~int~, we may want to say that ~short~ is not
+a subtype of ~int~.
+
+Looking at ~const char~ and ask whether it is a subtype of ~char~,
+we have to ask a similar question.
+#+BEGIN_SRC c
+  char const ch = 'x';
+
+  int f(char); f(ch);
+
+  int g(char const); g(ch)
+
+#+END_SRC
+Looking at these declarations, we notice that we can substitute one for
+the other in this example. But there is a place where they aren't
+interchangeable. Consider ~char const *~ and ~char *~:
+#+BEGIN_SRC c
+  char const *str "abc";
+
+  int f(char *p){
+    /* ... function statements ...*/
+  }
+#+END_SRC
+Since, the function may be able to modify the ~char~, we cannot always
+substitute one for the other[fn:6].
+*** Polymorphism
+/Polymorphism/ is typically defined to be an operator whose type depends
+on its operands or context. One example of polymorphism is operator
+overloading: ~a + b~, could mean, add two integers, add an integer and
+a float, or add two floats. Thus, some language allow you to overload 
+an operator. In the same spirit, many languages also allow you to 
+overload methods.
+
+* Footnotes
+
+[fn:1] generally used with ``exposed'' types
+[fn:2] generally used with ``abstract'' types
+[fn:3] C uses /structural equivalence/ for the purpose of simple arithmetic
+[fn:4] in terms of values, ~short~ is a subtype of ~int~
+[fn:5] this example shows that in terms of addresses, ~short~ is not a
+  subtype of ~int~
+[fn:6] the inverse relation, ~char *~ $\subseteq$ ~char const *~ allows
+  us the substitute ~char~ wherever we find ~char const *~
+
