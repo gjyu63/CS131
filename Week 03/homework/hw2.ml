@@ -48,3 +48,59 @@ let rec collect_rhs r lhs =
 let convert_grammar = function
   | (a, b) -> (a, collect_rhs b)
 ;;
+
+let rec get_list_length =
+  let list_length = get_list_length in
+  function
+  | [] -> 0
+  | hd :: tl -> 1 + list_length tl
+;;
+
+let rec get_prefixes n list =
+  let rec split m l =
+    let prefix =
+      split in
+    match l with
+    | [] -> []
+    | hd :: tl ->
+       if ((m - 1) < 1) then []
+       else hd :: prefix (m - 1) tl
+  in if n < 2 then [] else split n list :: get_prefixes (n - 1) list
+;;
+
+let split list =
+  get_prefixes (get_list_length list) list
+;;
+
+let rec check_rhs grammar rhs acceptor derivation fragment =
+  if rhs = [] then acceptor derivation fragment
+  else
+    match fragment with
+    | [] -> None
+    | hd :: tl -> match rhs with
+              | (N n) :: non_tail -> 
+                 (matcher grammar n
+                          (check_rhs grammar non_tail acceptor)
+                          derivation fragment)
+              | (T y) :: terminal_tail ->
+                 if hd = y 
+                 then (check_rhs grammar terminal_tail acceptor derivation tl)
+                 else None
+
+and check_rules grammar nt rhs acceptor derivation fragment =
+  if rhs = [] then None 
+  else match rhs with
+       | hd :: tl ->
+          match (check_rhs grammar hd acceptor
+                           (derivation @ [(nt, hd)]) fragment)
+          with
+          | Some(a, b) -> Some(a, b)
+          | None ->
+             (check_rules grammar
+                          nt tl acceptor derivation fragment)
+
+and matcher grammar nt acceptor derivation fragment =
+  (check_rules grammar nt (grammar nt) acceptor derivation fragment)
+
+let rec parse_prefix (start_symbol, grammar) acceptor fragment =
+    (matcher grammar start_symbol acceptor [] fragment)
