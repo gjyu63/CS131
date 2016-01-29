@@ -1,4 +1,3 @@
-
 (* get left hand sides helper function *)
 let rec get_lhs =
   (* function that checks for duplicate *)
@@ -78,29 +77,33 @@ let rec check_rhs grammar rhs acceptor derivation fragment =
     match fragment with
     | [] -> None
     | hd :: tl -> match rhs with
-              | (N n) :: non_tail -> 
-                 (matcher grammar n
-                          (check_rhs grammar non_tail acceptor)
-                          derivation fragment)
-              | (T y) :: terminal_tail ->
-                 if hd = y 
-                 then (check_rhs grammar terminal_tail acceptor derivation tl)
-                 else None
+                  | [] -> None
+                  | (N n) :: non_tail -> 
+                     (matcher grammar n
+                              (check_rhs grammar non_tail acceptor)
+                              derivation fragment)
+                  | (T t) :: terminal_tail ->
+                     if hd = t 
+                     then (check_rhs grammar terminal_tail acceptor
+                                     derivation tl)
+                     else None
 
-and check_rules grammar nt rhs acceptor derivation fragment =
+and check_symbols grammar n rhs acceptor derivation fragment =
   if rhs = [] then None 
   else match rhs with
+       | [] -> None
        | hd :: tl ->
           match (check_rhs grammar hd acceptor
-                           (derivation @ [(nt, hd)]) fragment)
+                           (derivation @ [(n, hd)]) fragment)
           with
-          | Some(a, b) -> Some(a, b)
+          | Some(a, b) ->
+             Some(a, b)
           | None ->
-             (check_rules grammar
-                          nt tl acceptor derivation fragment)
+             (check_symbols grammar
+                          n tl acceptor derivation fragment)
 
 and matcher grammar nt acceptor derivation fragment =
-  (check_rules grammar nt (grammar nt) acceptor derivation fragment)
+  (check_symbols grammar nt (grammar nt) acceptor derivation fragment)
 
 let rec parse_prefix (start_symbol, grammar) acceptor fragment =
     (matcher grammar start_symbol acceptor [] fragment)
