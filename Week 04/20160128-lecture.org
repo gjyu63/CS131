@@ -1,0 +1,234 @@
+#+AUTHOR: Ryan Sharif
+#+TITLE: Generic Types
+#+LATEX_HEADER: \usepackage{amsthm}
+#+LATEX_HEADER: \usepackage{mathtools}
+#+LATEX_HEADER: \usepackage{tikz}
+
+#+LaTeX_HEADER: \usepackage[T1]{fontenc}
+#+LaTeX_HEADER: \usepackage{mathpazo}
+#+LaTeX_HEADER: \linespread{1.05}
+#+LaTeX_HEADER: \usepackage[scaled]{helvet}
+#+LaTeX_HEADER: \usepackage{courier}
+#+LATEX_HEADER: \usepackage{listings}
+#+LATEX_HEADER: \usetikzlibrary{positioning,calc}
+# #+LaTeX_CLASS_OPTIONS: [letter,twoside,twocolumn]
+#+OPTIONS: toc:nil
+
+* Generic types in Java continued...
+
+** Bounded wild cards
+#+BEGIN_SRC java
+  public void
+      printShapes(Collection
+                  <Shape> shapes){
+      for(i; shapes) printShape(i);
+  }
+#+END_SRC
+
+We run into the same problem that we had last time with Strings
+using the function above. The solution to this problem is to use
+a /bounded wildcard/.
+
+#+BEGIN_SRC java
+  public void
+      printShapes(Collection
+                  <? extends Shape> shapes){
+      for(i; shapes) printShape(i);
+  }
+#+END_SRC
+
+** Copying an array to a collection
+#+BEGIN_SRC java
+  void <T> copyac(T[] a, Collection<T> c){
+      for (T.o:a)
+          c.add(o)
+  }
+
+  RectShape[] x;
+  Collection<Shape> y;
+  copyac(x,y);
+#+END_SRC
+
+The problem with the code above is that even though we know
+that RectShape is a type of Shape, the compiler is going
+to yell at us.
+
+#+BEGIN_SRC java
+  void <T> copyac(T[] a, Collection<? super T> c){
+      for (T.o:a)
+          c.add(o)
+  }
+
+  RectShape[] x;
+  Collection<Shape> y;
+  copyac(x,y);
+#+END_SRC
+
+The solution to the problem is to tell the Java compiler that we have
+a parent object in second argument.
+
+** Implementation of generics, wildcards, etc...
+The assumption behind generics is that every object is represented the
+same way, they are represented by a `pointer'.  The bytecode
+interpreter deals only with non-generic types, so if you see in the
+source code a collection of strings, the bytecode will only see
+collection. This keeps the bytecode simple. Sometimes, because the
+interpreter loses track of where it is at, it will cast at runtime as
+needed. This process is called /erasure/ because we've taken information
+we knew at compile time and erased it at runtime.
+
+** An alternative, duck typing
+The basic idea of duck typing, is to stop caring about the intrinsic
+type of an object. If you want to see if something is a duck, look at
+its behavior, and if it behaves like a duck, call it a duck, i.e.,
+judge object by their behavior, not by their ``type''. This is the
+approach the /Python/ implements. The advantage of this approach is
+that we can get our program working right away in exchange for
+safety.
+
+* Names
+** Binding
+Many times in our programs, a name just stands in for a particular
+value.  A key notion of this idea is /binding/, i.e., a set of
+bindings, environment, or namespaces. With this notion we need
+to understand /binding time/. 
+
+#+BEGIN_SRC c
+  int i = 27;
+#+END_SRC
+
+Superficially, we know that the name $i$ and value 27 are bound, but
+when does this actually occur. If the variable is declared globally,
+then the variable is bound before execution. If it is a local
+variable, then it is an automatic variable and is bound when the
+declaration is executed. But suppose we take the address of $i$, ~&i~,
+then there must be different bindings. When we ask for the address of
+$i$, the binding time may be different for $i$. If the variable is
+/static/ then it is bound at link time. If the variable is local, then
+the binding time is at /function entry/. Thus, we'll know its address
+before we've used it, which is what we should expect.
+
+** sizeof i
+
+What is the binding time of $i$ when we call ~sizeof~. The binding
+time will be at compile time at the latest. The actual binding time
+took place at the time when programmers were writing the compiler for
+the language in question.
+
+** adhoc namespaces or primitive namespaces
+/Primitive namespaces/ are those that are built into the language.
+
+#+BEGIN_SRC c
+  int main(void){
+    struct f {int f;};
+    struct f f;
+  }
+#+END_SRC
+
+Since the compiler can look at a different namespace for each of these
+declarations of ~f~, we are allowed to write the code we've written
+above.
+
+#+BEGIN_SRC c
+    int main(void){
+      struct f {int f;};
+      struct f f;
+      enum f{f}};
+    }
+#+END_SRC
+
+We cannot do this, because the namespace for the enumerated variable `f' has already
+been taken. We can, however, do this:
+
+#+BEGIN_SRC c
+      int main(void){
+        struct f {int f;};
+        struct f f;
+        enum f{zero};
+  #include<f>;
+      f:goto f;
+  #define f g
+      }
+#+END_SRC
+
+Thus we have the following namespaces in C:
+1. preprocessor IDs
+2. struct (unions) tags
+3. struct members
+4. enum tags
+5. filenames
+6. labels
+7. ordinary name
+
+** Labeled namespaces
+Python implements labeled namespaces. It allows us to name our namespaces.
+ML calls these structures, C++ calls them namespaces, and Java and Ada
+call these packages.
+
+** Control via visibility modifier
+We can use keywords in Java:
+
+| keyword   | in-class | subclasses | subclass | other packages |
+|-----------+----------+------------+----------+----------------|
+| public    | yes      | yes        | yes      | yes            |
+| protected | yes      | yes        | yes      | no             |
+| (none)    | yes      | yes        | no       | no             |
+| private   | yes      | no         | no       | no             |
+
+How did Java come up with this hierarchy? We can look at two things:
+the /class hierarchy/, and the /package hierarchy/. So suppose we have
+an example package: edu.ucla.cs.cs131.Tester, we get a namespace that
+is under control of the developers, it is split by the development
+process. So if the program is complicated, it will work the same.  In
+the class hierarchy, we have /Object/ at the top, with other classes
+behaving differently, with groups of behavior differentiating
+subclasses from other subclasses.
+
+** Explicit namespaces
+In this namespace approach, we create a namespace and ship it whenever
+we use it, which is more powerful, albeit more complex.
+
+#+BEGIN_SRC ocaml
+  module a =
+    struct
+      type 'a queue = Empty | Node of 'a * 'a queue * 'int
+    end
+
+  (* we can protect things in our names space by using
+       signatures *)
+
+  signature module type Q =
+    sig
+      type 'a queue
+      let f : 'a queue 
+    end
+#+END_SRC
+Functors in OCaml will allow us to generate structures to structures.
+
+* Java's appendix
+#+BEGIN_SRC java
+  public class Object {
+      /* imporant methods for Java */
+
+      /* Constructer for testing code */
+      public Object();
+
+      /* Default for comparing addresses */
+      public boolean equals(Object obj);
+
+      /* Default for hashing an object's pointer */
+      public int hashCode();
+
+      /* returns at compile time information at runtime */
+      public final Class getClass();
+
+      /* returns a string represenation of an object */
+      public String toString();
+
+      /* last will and testament of an object */
+      protected void finalize() throws Throwable;
+
+      /* clone any object */
+      protect Object clone() throws CloneNotSupportedException;
+  }
+#+END_SRC
