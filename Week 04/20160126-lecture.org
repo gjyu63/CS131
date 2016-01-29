@@ -85,6 +85,52 @@ overloading: ~a + b~, could mean, add two integers, add an integer and
 a float, or add two floats. Thus, some language allow you to overload 
 an operator. In the same spirit, many languages also allow you to 
 overload methods.
+*** Overloading
+Suppose that we have a C++ method definition that is overloaded:
+#+BEGIN_SRC c
+  bool f(int, float);
+  bool f(float, int);
+
+  f(3,5);
+#+END_SRC
+
+The compiler will complain when we call ~f~ because it won't know
+which overloaded function to call.
+*** Parametric polymorphism
+Parametric  polymorphism  attempts to  solve  the  problem of  ad  hoc
+polymorphism.   Instead  of thinking  about  specific  types or  their
+aliases,  we  think  about  types  in  general.  Thus,  we  add  /type
+variables/,  which means  we need  /type constructors/.  This type  of
+checking was first implemented in ML. Newer versions of Java implements
+parametric polymorphism.
+
+#+BEGIN_SRC java
+  for (iterator i = c.iterator(); 
+       i.hasNext(1))
+        if ((String)i.next()).length()
+                                  <= 10))
+        c+++;
+#+END_SRC
+
+Modern Java would rewrite this code:
+#+BEGIN_SRC java
+  for (Iterator <String> i =
+           c.iterator();i.hasNext())
+      if(i.next().length()
+         <= 10)
+          c+++;
+#+END_SRC
+
+Languages like ML and Java use  /generics/. Languages like C++ and Ada
+use /templates/ which is code that must be instantiated. The advantage
+of  templating   is  that   it  is   east  to   explain.  Furthermore,
+instatiations can be  optimized separately and templates  can make use
+of knowledge of  the type variables. In contrast, generic  code can be
+compiled  directly  to machine  code.  This  is possible  because  the
+compiler makes  an assumption:  /all values  are implemented  the same
+way/. Thus, we  can compile one copy  of the machine code  and it will
+work  for all  instantiations. Finally,  you can  check types  without
+instantiation.
 
 * Footnotes
 
