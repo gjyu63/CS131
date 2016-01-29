@@ -140,3 +140,60 @@ symbols, and return a list of prefixes.
     ``( Expr )''. In that case when we seek a derivation, we will
     look once for the left paranthesis, and once again when we look
     for the right paranthesis. 
+
+** A new approach
+
+   After reading through the T.A.'s notes on Piazza. I've decided to
+   abandon my first approach to the problem, as I saw that there were
+   problems to my approach from the offset. As suggested by the T.A.,
+   we can tackle the problem by writing two helper functions for
+   the prefix parser: /check_rhs/ and /check_rules/.
+
+*** check_rhs
+
+#+BEGIN_SRC ocaml :tangle hw2.ml
+  let rec check_rhs grammar rhs acceptor derivation fragment =
+    if rhs = [] then acceptor derivation fragment
+    else
+      match fragment with
+      | [] -> None
+      | hd :: tl -> match rhs with
+                | (N n) :: non_tail -> 
+                   (matcher grammar n
+                            (check_rhs grammar non_tail acceptor)
+                            derivation fragment)
+                | (T y) :: terminal_tail ->
+                   if hd = y 
+                   then (check_rhs grammar terminal_tail acceptor derivation tl)
+                   else None
+#+END_SRC
+
+*** check_rules
+
+#+BEGIN_SRC ocaml :tangle hw2.ml
+  and check_rules grammar nt rhs acceptor derivation fragment =
+    if rhs = [] then None 
+    else match rhs with
+         | hd :: tl ->
+            match (check_rhs grammar hd acceptor
+                             (derivation @ [(nt, hd)]) fragment)
+            with
+            | Some(a, b) -> Some(a, b)
+            | None ->
+               (check_rules grammar
+                            nt tl acceptor derivation fragment)
+#+END_SRC
+
+*** matcher
+
+#+BEGIN_SRC ocaml :tangle hw2.ml
+  and matcher grammar nt acceptor derivation fragment =
+    (check_rules grammar nt (grammar nt) acceptor derivation fragment)
+#+END_SRC
+
+*** parse_prefix
+
+#+BEGIN_SRC ocaml :tangle hw2.ml
+let rec parse_prefix (start_symbol, grammar) acceptor fragment =
+    (matcher grammar start_symbol acceptor [] fragment)
+#+END_SRC
