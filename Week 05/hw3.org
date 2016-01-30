@@ -29,3 +29,22 @@ less /proc/cpuinfo
 We can similarly inspect our machine's memory information by look at
 the `/proc/meminfo' file, which tells me that I have 764300 kB of
 memory total.
+* Running the tests
+** Extracting jmm.jar
+The files that we'll need for this assignment are compressed in 
+the `jmm.jar' file. Thus, we'll need to decompress the jar file
+before we can do anything else:
+
+#+BEGIN_SRC sh :result output
+jar -xvf executables/jmm.jar 
+#+END_SRC
+
+#+RESULTS:
+| created:  | META-INF/              |
+| inflated: | META-INF/MANIFEST.MF   |
+| inflated: | NullState.java         |
+| inflated: | State.java             |
+| inflated: | SwapTest.java          |
+| inflated: | SynchronizedState.java |
+| inflated: | UnsafeMemory.java      |
+
