@@ -1,1 +1,31 @@
 #+TITLE: Breaking and fixing the Java Memory Model for profit
+
+* Introduction
+** Checking environment variables and Java version
+*** Java version
+Before we get started doing anything else in the assignment,
+let's make sure that we have our environment variables and
+an appropriate version of Java. I'll be using a local copy
+of JDK version 1.8.071:
+
+#+BEGIN_SRC sh 
+java -version
+#+END_SRC
+
+#+RESULTS:
+Java(TM) SE Runtime Environment (build 1.8.0_71-b15)
+Java HotSpot(TM) 64-Bit Server VM (build 25.71-b15, mixed mode)
+*** CPU information
+We can look at our CPU information using ~less~ to see that we will
+be using an Inter Core i3 Processor running at 3.3GHz. My particular
+machine reports a single core. This may or may not affect the way
+interleaved CPU instructions are executed on several cores. Thus,
+I will run my code locally and on UCLA's SEASNET servers. 
+
+#+BEGIN_SRC sh
+less /proc/cpuinfo
+#+END_SRC
+*** Memory Information
+We can similarly inspect our machine's memory information by look at
+the `/proc/meminfo' file, which tells me that I have 764300 kB of
+memory total.
