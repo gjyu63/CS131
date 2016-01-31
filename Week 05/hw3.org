@@ -73,14 +73,44 @@ clean:
 	rm $(OUTPUT)* 
 #+END_SRC
 ** Testing
-With the prerequisite files and environment variables all in order, we can begin
-testing and working on the assignment.
+With the prerequisite files and environment variables all in order, we
+can begin testing and working on the assignment. We'll begin our tests
+on the Synchronized implementation, moving over to the Null model
+afterwards.
+*** Synchronized model
+Here we test the synchronized model first. The initial results on my
+local machine indicate that this program is not benefiting from more
+threads. In fact, the more cores we add, the worse our program
+performs. Given, these results, I will move over to the SEASNET
+servers to test application peformance on a multicore machine.
 
 #+BEGIN_SRC sh :result output
 cd files/executables;
+java UnsafeMemory Synchronized 1 1000000 6 5 6 3 0 3
+java UnsafeMemory Synchronized 2 1000000 6 5 6 3 0 3
+java UnsafeMemory Synchronized 4 1000000 6 5 6 3 0 3
 java UnsafeMemory Synchronized 8 1000000 6 5 6 3 0 3
+java UnsafeMemory Synchronized 16 1000000 6 5 6 3 0 3
+java UnsafeMemory Synchronized 32 1000000 6 5 6 3 0 3
 #+END_SRC
 
 #+RESULTS:
-: Threads average 785.473 ns/transition
+| Threads  average | 70.7651  ns/transition |
+| Threads  average | 183.874  ns/transition |
+| Threads  average | 428.767  ns/transition |
+| Threads  average | 843.679  ns/transition |
+| Threads  average | 1842.09  ns/transition |
+| Threads  average | 3631.31  ns/transition |
 
+Below are the tests and results from running the same
+application on the SEASNET servers.
+
+#+BEGIN_SRC sh :result output
+cd files/executables;
+java UnsafeMemory Synchronized 1 1000000 6 5 6 3 0 3
+java UnsafeMemory Synchronized 2 1000000 6 5 6 3 0 3
+java UnsafeMemory Synchronized 4 1000000 6 5 6 3 0 3
+java UnsafeMemory Synchronized 8 1000000 6 5 6 3 0 3
+java UnsafeMemory Synchronized 16 1000000 6 5 6 3 0 3
+java UnsafeMemory Synchronized 32 1000000 6 5 6 3 0 3
+#+END_SRC
