@@ -40,11 +40,47 @@ jar -xvf executables/jmm.jar
 #+END_SRC
 
 #+RESULTS:
-| created:  | META-INF/              |
-| inflated: | META-INF/MANIFEST.MF   |
-| inflated: | NullState.java         |
-| inflated: | State.java             |
-| inflated: | SwapTest.java          |
-| inflated: | SynchronizedState.java |
-| inflated: | UnsafeMemory.java      |
+ created:   META-INF/              
+ inflated:  META-INF/MANIFEST.MF   
+ inflated:  NullState.java         
+ inflated:  State.java             
+ inflated:  SwapTest.java          
+ inflated:  SynchronizedState.java 
+ inflated:  UnsafeMemory.java      
+** Makefile
+Compiling the source files into executable class files will become tedious.
+We can automate this process using a Makefile:
+
+#+BEGIN_SRC make
+JC = javac
+OUTPUT = executables/
+
+all: nullstate swaptest synchronized_state state unsafe_memory
+
+# All classes for this assingnment
+nullstate : NullState.java
+	$(JC) -d $(OUTPUT) NullState.java
+swaptest : SwapTest.java
+	$(JC) -d $(OUTPUT) SwapTest.java
+synchronized_state : SynchronizedState.java
+	$(JC) -d $(OUTPUT) SynchronizedState.java
+state: State.java
+	$(JC) -d $(OUTPUT) State.java
+unsafe_memory: UnsafeMemory.java
+	$(JC) -d $(OUTPUT) UnsafeMemory.java
+
+clean:
+	rm $(OUTPUT)* 
+#+END_SRC
+** Testing
+With the prerequisite files and environment variables all in order, we can begin
+testing and working on the assignment.
+
+#+BEGIN_SRC sh :result output
+cd files/executables;
+java UnsafeMemory Synchronized 8 1000000 6 5 6 3 0 3
+#+END_SRC
+
+#+RESULTS:
+: Threads average 785.473 ns/transition
 
