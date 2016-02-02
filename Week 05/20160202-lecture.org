@@ -14,3 +14,88 @@
 # #+LaTeX_CLASS_OPTIONS: [letter,twoside,twocolumn]
 #+OPTIONS: toc:nil
 
+* The World's fastest computer
+The fastest computer today is the Tianhe-2 with 3,120,000 cores in
+about 16,000 nodes. Each has 2 Xeon bridges with 64 GiB RAM shared
+and 2 Xeon Phi with 8 GiB RAM. This computer is capable of performing
+34 Peta-flops. The bechmark for these computers tend to use the
+LINPACK bechmark, which uses linear programming. This computer consumes
+18MW of power.
+
+* Java on high performance machines
+** Java's history
+*** Sun microsystems 99 problems
+The original Java design theme was implemented by people at Sun
+Microsystems in the early 1990's where they were using UNIX servers
+and workstations on a network. The original problem that Java hoped to
+solve was research and development for the Internet of things. The
+embedded world does not have x86 processors. Manufacturers like to
+choose cheap chips.  For each new architecture, you'd need to
+recompile your source code every single time. Another problem for the
+Internet of things is reliability. Thirdly, they also had to worry
+about slow connections, which is not compatible with large software
+updates. Finally, C programs crash too often to have a reliable
+toaster that is connected to the Internet. 
+
+Hoping to build on the innovation of modular designed software, they
+considered using C++ over C. There were several problems using C++.
+First, C++ is fairly complicated. Furthermore, C++ is just as
+susceptible to crashing as often as C. Without an easy solution, Sun
+Microsystems looked at what Xerox PARC was doing (SmallTalk).
+
+SmallTalk was designed in a /byte-coded engine/, which was mostly
+portables, with a few low level components written in machine code.
+This engine allows you to also do subscript checking. This idea solved
+most of the problems that Sun Microsystems was facing, so they
+borrowed most of it, creating a language with C-like syntax atop a
+byte-coded engine.
+
+*** Internet browser
+This research project was eventually scrapped because Sun couldn't
+make much money on it. So the engineers decided to make the project
+public by working on an Internet browser to best Mosaic, the best
+browser at the time. They called this browser HotJava, which
+introduced the notion of an /applet/, which is Java bytecode delivered
+from server to browser.
+
+** What is Java missing?
+- The characteristics of the /primitive/ types are machine dependent in
+  C and C++. Thus, the number of bits for an ~int~ will be different on
+  different machines. This standarization encourages portability, i.e.,
+  /write once, run everywhere/.
+
+- Optimizations by compilers for different architectures, e.g., the
+  PowerPC multiply add instruction that Java could not use for many
+  years.
+
+- Arrays are linear sets of objects in C and C++, able to live anywhere:
+  on the stack, in static storage, and allocated on the heap. Java does
+  not allow arrays on the stack or in static storage. And Java does not
+  allow you delete from the heap, removing the problem of dangling 
+  pointers. Thus, we require a garbage collector. Hence, arrays
+  are thought of as objects, first class objects. Like C and C++, however,
+  arrays are inflexible.
+
+- C++ allows multiple inheritance, thus it can have multiple parent
+  classes. Java solves most of the problems that would work well with
+  multiple inheritance by using /interfaces/. Abstract classes allow
+  what interfaces provides, except that it also provides the implementation
+
+** Threads
+
+*** The life cycle of a thread
+    When you create a new thread, it starts out in the NEW state, no
+    thread is actually running yet. ~t.start()~ says move to the
+    RUNNABLE state. Once running, a thread can /sleep/, /wait/, or
+    perform /I\/O/. ~TIMEDWAITING~, ~WAITING~, ~BLOCKED~. Once the
+    thread is done, it becomes ~TERMINATED~.
+
+*** Synchronization
+    The default is unsynchronized but there are ways around it. You
+    can do the following:
+    #+BEGIN_SRC java
+            class {
+                int x;
+                synchronized int next(){ return x ++; }
+            }
+    #+END_SRC
