@@ -29,3 +29,120 @@ less /proc/cpuinfo
 We can similarly inspect our machine's memory information by look at
 the `/proc/meminfo' file, which tells me that I have 764300 kB of
 memory total.
+* Running the tests
+** Extracting jmm.jar
+The files that we'll need for this assignment are compressed in 
+the `jmm.jar' file. Thus, we'll need to decompress the jar file
+before we can do anything else:
+
+#+BEGIN_SRC sh :result output
+jar -xvf executables/jmm.jar 
+#+END_SRC
+
+#+RESULTS:
+ created:   META-INF/              
+ inflated:  META-INF/MANIFEST.MF   
+ inflated:  NullState.java         
+ inflated:  State.java             
+ inflated:  SwapTest.java          
+ inflated:  SynchronizedState.java 
+ inflated:  UnsafeMemory.java      
+** Makefile
+Compiling the source files into executable class files will become tedious.
+We can automate this process using a Makefile:
+
+#+BEGIN_SRC make
+JC = javac
+OUTPUT = executables/
+
+all: nullstate swaptest synchronized_state state unsafe_memory
+
+# All classes for this assingnment
+nullstate : NullState.java
+	$(JC) -d $(OUTPUT) NullState.java
+swaptest : SwapTest.java
+	$(JC) -d $(OUTPUT) SwapTest.java
+synchronized_state : SynchronizedState.java
+	$(JC) -d $(OUTPUT) SynchronizedState.java
+state: State.java
+	$(JC) -d $(OUTPUT) State.java
+unsafe_memory: UnsafeMemory.java
+	$(JC) -d $(OUTPUT) UnsafeMemory.java
+
+clean:
+	rm $(OUTPUT)* 
+#+END_SRC
+** Testing
+With the prerequisite files and environment variables all in order, we
+can begin testing and working on the assignment. We'll begin our tests
+on the Synchronized implementation, moving over to the Null model
+afterwards.
+*** Synchronized model
+Here we test the synchronized model first. The initial results on my
+local machine indicate that this program is not benefiting from more
+threads. In fact, the more cores we add, the worse our program
+performs. Given, these results, I will move over to the SEASNET
+servers to test application peformance on a multicore machine.
+
+#+BEGIN_SRC sh :result output
+cd files/executables;
+java UnsafeMemory Synchronized 1 1000000 6 5 6 3 0 3
+java UnsafeMemory Synchronized 2 1000000 6 5 6 3 0 3
+java UnsafeMemory Synchronized 4 1000000 6 5 6 3 0 3
+java UnsafeMemory Synchronized 8 1000000 6 5 6 3 0 3
+java UnsafeMemory Synchronized 16 1000000 6 5 6 3 0 3
+java UnsafeMemory Synchronized 32 1000000 6 5 6 3 0 3
+#+END_SRC
+
+#+RESULTS:
+| Threads  average | 70.7651  ns/transition |
+| Threads  average | 183.874  ns/transition |
+| Threads  average | 428.767  ns/transition |
+| Threads  average | 843.679  ns/transition |
+| Threads  average | 1842.09  ns/transition |
+| Threads  average | 3631.31  ns/transition |
+
+Below are the tests and results from running the same
+application on the SEASNET servers. The results from
+the SEASNET servers run approximately twice as fast
+as the results my local machine produced. 
+
+#+BEGIN_SRC sh :result output
+cd files/executables;
+echo -n "01: "; java UnsafeMemory Synchronized 1 1000000 6 5 6 3 0 3
+echo -n "02: "; java UnsafeMemory Synchronized 2 1000000 6 5 6 3 0 3
+echo -n "04: "; java UnsafeMemory Synchronized 4 1000000 6 5 6 3 0 3
+echo -n "08: "; java UnsafeMemory Synchronized 8 1000000 6 5 6 3 0 3
+echo -n "16: ";java UnsafeMemory Synchronized 16 1000000 6 5 6 3 0 3
+echo -n "32: ";java UnsafeMemory Synchronized 32 1000000 6 5 6 3 0 3
+#+END_SRC
+
+#+RESULTS:
+| 01:  Threads | average  69.6014  ns/transition |
+| 02:  Threads | average  466.235  ns/transition |
+| 04:  Threads | average  1472.91  ns/transition |
+| 08:  Threads | average  2787.14  ns/transition |
+| 16:  Threads | average  5508.66  ns/transition |
+| 32:  Threads | average  13323.8  ns/transition |
+
+*** Null model
+#+BEGIN_SRC sh :result output
+cd files/executables;
+echo -n "01 "; java UnsafeMemory Null 1 1000000 6 5 6 3 0 3
+
+echo -n "02 "; java UnsafeMemory Null 2 1000000 6 5 6 3 0 3
+echo -n "04 "; java UnsafeMemory Null 4 1000000 6 5 6 3 0 3
+echo -n "08 "; java UnsafeMemory Null 8 1000000 6 5 6 3 0 3
+echo -n "16 "; java UnsafeMemory Null 16 1000000 6 5 6 3 0 3
+echo -n "32 "; java UnsafeMemory Null 32 1000000 6 5 6 3 0 3
+#+END_SRC
+
+#+RESULTS:
+| 1  Threads  | average  42.6443  ns/transition |
+| 2  Threads  | average  97.9121  ns/transition |
+| 4  Threads  | average  256.354  ns/transition |
+| 8  Threads  | average  481.088  ns/transition |
+| 16  Threads | average  1400.48  ns/transition |
+| 32  Threads | average  1701.61  ns/transition |
+
+
