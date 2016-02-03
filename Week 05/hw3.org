@@ -1,4 +1,5 @@
 #+TITLE: Breaking and fixing the Java Memory Model for profit
+#+LaTeX_HEADER: \usemintedstyle{tango}
 
 * Introduction
 ** Checking environment variables and Java version
@@ -109,6 +110,7 @@ as the results my local machine produced.
 
 #+BEGIN_SRC sh :result output
 cd files/executables;
+echo "Synchronized tests"; echo "first test set"
 echo -n "01: "; java UnsafeMemory Synchronized 1 1000000 6 5 6 3 0 3
 echo -n "02: "; java UnsafeMemory Synchronized 2 1000000 6 5 6 3 0 3
 echo -n "04: "; java UnsafeMemory Synchronized 4 1000000 6 5 6 3 0 3
@@ -118,18 +120,68 @@ echo -n "32: ";java UnsafeMemory Synchronized 32 1000000 6 5 6 3 0 3
 #+END_SRC
 
 #+RESULTS:
-| 01:  Threads | average  69.6014  ns/transition |
-| 02:  Threads | average  466.235  ns/transition |
-| 04:  Threads | average  1472.91  ns/transition |
-| 08:  Threads | average  2787.14  ns/transition |
-| 16:  Threads | average  5508.66  ns/transition |
-| 32:  Threads | average  13323.8  ns/transition |
+| Synchronized | tests   |         |         |               |
+|        first | test    | set     |         |               |
+|          01: | Threads | average | 85.2718 | ns/transition |
+|          02: | Threads | average | 192.319 | ns/transition |
+|          04: | Threads | average | 479.501 | ns/transition |
+|          08: | Threads | average | 791.218 | ns/transition |
+|          16: | Threads | average |  1634.2 | ns/transition |
+|          32: | Threads | average | 4202.26 | ns/transition |
+
+#+BEGIN_SRC sh :result output
+cd files/executables;
+echo "second test set";
+echo -n "01: "; java UnsafeMemory Synchronized 1 1000000 2 1 1 0 0 1
+echo -n "02: "; java UnsafeMemory Synchronized 2 1000000 2 1 1 0 0 1
+echo -n "04: "; java UnsafeMemory Synchronized 4 1000000 2 1 1 0 0 1
+echo -n "08: "; java UnsafeMemory Synchronized 8 1000000 2 1 1 0 0 1
+echo -n "16: "; java UnsafeMemory Synchronized 16 1000000 2 1 1 0 0 1
+echo -n "32: "; java UnsafeMemory Synchronized 32 1000000 2 1 1 0 0 1
+#+END_SRC
+
+#+RESULTS:
+| second | test    | set     |         |               |
+|    01: | Threads | average | 102.025 | ns/transition |
+|    02: | Threads | average | 229.165 | ns/transition |
+|    04: | Threads | average | 543.071 | ns/transition |
+|    08: | Threads | average | 1278.21 | ns/transition |
+|    16: | Threads | average |  2768.9 | ns/transition |
+|    32: | Threads | average | 4956.99 | ns/transition |
+
+#+BEGIN_SRC sh :result output
+cd files/executables;
+echo "thirds test set";
+echo -n "01: "; java UnsafeMemory Synchronized 1 1000000 8 1 1 1 1 1
+echo -n "02: "; java UnsafeMemory Synchronized 2 1000000 8 1 1 1 1 1
+echo -n "04: "; java UnsafeMemory Synchronized 4 1000000 8 1 1 1 1 1
+echo -n "08: "; java UnsafeMemory Synchronized 8 1000000 8 1 1 1 1 1
+echo -n "16: "; java UnsafeMemory Synchronized 16 1000000 8 1 1 1 1 1
+echo -n "32: "; java UnsafeMemory Synchronized 32 1000000 8 1 1 1 1 1
+#+END_SRC
+
+#+RESULTS:
+| thirds | test    | set     |         |               |
+|    01: | Threads | average |  86.214 | ns/transition |
+|    02: | Threads | average | 205.809 | ns/transition |
+|    04: | Threads | average | 491.793 | ns/transition |
+|    08: | Threads | average | 1030.86 | ns/transition |
+|    16: | Threads | average | 2238.65 | ns/transition |
+|    32: | Threads | average |  5230.2 | ns/transition |
+
 
 *** Null model
+As indicated by the specification for this assignment, the
+Null model does not yet work but still passes the test,
+thus it runs to completion much faster than the synchronized
+model. We should note the overhead of creating threads
+at least on this local machine adds considerable running
+time to our program despite the fact that no actual work
+is being done.
+
 #+BEGIN_SRC sh :result output
 cd files/executables;
 echo -n "01 "; java UnsafeMemory Null 1 1000000 6 5 6 3 0 3
-
 echo -n "02 "; java UnsafeMemory Null 2 1000000 6 5 6 3 0 3
 echo -n "04 "; java UnsafeMemory Null 4 1000000 6 5 6 3 0 3
 echo -n "08 "; java UnsafeMemory Null 8 1000000 6 5 6 3 0 3
@@ -145,4 +197,85 @@ echo -n "32 "; java UnsafeMemory Null 32 1000000 6 5 6 3 0 3
 | 16  Threads | average  1400.48  ns/transition |
 | 32  Threads | average  1701.61  ns/transition |
 
+#+BEGIN_SRC sh :result output
+cd files/executables;
+echo "second test set";
+echo -n "01: "; java UnsafeMemory Null 1 1000000 2 1 1 0 0 1
+echo -n "02: "; java UnsafeMemory Null 2 1000000 2 1 1 0 0 1
+echo -n "04: "; java UnsafeMemory Null 4 1000000 2 1 1 0 0 1
+echo -n "08: "; java UnsafeMemory Null 8 1000000 2 1 1 0 0 1
+echo -n "16: "; java UnsafeMemory Null 16 1000000 2 1 1 0 0 1
+echo -n "32: "; java UnsafeMemory Null 32 1000000 2 1 1 0 0 1
+#+END_SRC
 
+#+RESULTS:
+| second | test    | set     |         |               |
+|    01: | Threads | average | 41.2622 | ns/transition |
+|    02: | Threads | average | 124.858 | ns/transition |
+|    04: | Threads | average | 259.175 | ns/transition |
+|    08: | Threads | average | 610.105 | ns/transition |
+|    16: | Threads | average | 958.078 | ns/transition |
+|    32: | Threads | average |  1673.4 | ns/transition |
+
+
+#+BEGIN_SRC sh :result output
+cd files/executables;
+echo "thirds test set";
+echo -n "01: "; java UnsafeMemory Null 1 1000000 8 1 1 1 1 1
+echo -n "02: "; java UnsafeMemory Null 2 1000000 8 1 1 1 1 1
+echo -n "04: "; java UnsafeMemory Null 4 1000000 8 1 1 1 1 1
+echo -n "08: "; java UnsafeMemory Null 8 1000000 8 1 1 1 1 1
+echo -n "16: "; java UnsafeMemory Null 16 1000000 8 1 1 1 1 1
+echo -n "32: "; java UnsafeMemory Null 32 1000000 8 1 1 1 1 1
+#+END_SRC
+
+#+RESULTS:
+| thirds | test    | set     |         |               |
+|    01: | Threads | average | 41.2914 | ns/transition |
+|    02: | Threads | average | 118.593 | ns/transition |
+|    04: | Threads | average | 290.362 | ns/transition |
+|    08: | Threads | average | 520.991 | ns/transition |
+|    16: | Threads | average | 1633.16 | ns/transition |
+|    32: | Threads | average | 2000.38 | ns/transition |
+
+* Unsynchronized implementation
+  We can begin implementing the unsynchronized model by bringing over
+  the code from the synchronized model and tinkering with it. We will
+  start with a basic class definition, naming the class
+  UnsynchronizedState and letting the Java compiler know that we'll be
+  implementing the class State. This means we'll have to take all the
+  method signatures from State and actually implement them here:
+
+  #+BEGIN_SRC java :tangle files/UnsynchronizedState.java
+    class UnsynchronizedState implements State {
+        private byte[] value;
+        private byte maxval;
+  #+END_SRC
+
+  Similar to the synchronized version, we'll have two constructors: a
+  constructor that receives an array to initialize to some value, and
+  sets the maximum value for the object to 127. We also have a second
+  constructor that similarly takes in an array but also takes in a
+  byte, setting the maximum value for this object to m.
+
+  #+BEGIN_SRC java :tangle files/UnsynchronizedState.java
+    UnsynchronizedState(byte[] v) { value = v; maxval = 127; }
+
+    UnsynchronizedState(byte[] v, byte m) { value = v; maxval = m; }
+  #+END_SRC
+
+  #+BEGIN_SRC java
+        public int size() { return value.length; }
+
+        public byte[] current() { return value; }
+
+        public synchronized boolean swap(int i, int j) {
+            if (value[i] <= 0 || value[j] >= maxval) {
+                return false;
+            }
+            value[i]--;
+            value[j]++;
+            return true;
+        }
+    }
+  #+END_SRC
