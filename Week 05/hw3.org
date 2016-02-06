@@ -264,12 +264,15 @@ echo -n "32: "; java UnsafeMemory Null 32 1000000 8 1 1 1 1 1
     UnsynchronizedState(byte[] v, byte m) { value = v; maxval = m; }
   #+END_SRC
 
-  #+BEGIN_SRC java
+  The key change to the class is simply a removal of the keyword
+  ~synchronized~ from the definition of the swap method:
+
+  #+BEGIN_SRC java :tangle files/UnsynchronizedState.java
         public int size() { return value.length; }
 
         public byte[] current() { return value; }
 
-        public synchronized boolean swap(int i, int j) {
+        public boolean swap(int i, int j) {
             if (value[i] <= 0 || value[j] >= maxval) {
                 return false;
             }
@@ -279,3 +282,40 @@ echo -n "32: "; java UnsafeMemory Null 32 1000000 8 1 1 1 1 1
         }
     }
   #+END_SRC
+
+  We can compile our class and test it like the other two we've
+  tested before:
+
+  #+BEGIN_SRC sh :output results
+    cd files;
+    make unsynchronized_state
+  #+END_SRC
+
+  #+RESULTS:
+  : javac -d executables/ UnsynchronizedState.java
+
+  Finally, before we can run our program again, we need to ensure that
+  our program knows how to use the new class by adding two lines of code:
+  #+BEGIN_SRC java
+    else if (args[0].equals("Unsynchronized"))
+        s = new UnsynchronizedState(stateArg, maxval);
+  #+END_SRC
+
+  #+BEGIN_SRC sh :result output
+    cd files/executables;
+    echo -n "01 "; java UnsafeMemory Unsynchronized 1 1000000 6 5 6 3 0 3
+    echo -n "02 "; java UnsafeMemory Unsynchronized 2 1000000 6 5 6 3 0 3
+    echo -n "04 "; java UnsafeMemory Unsynchronized 4 1000000 6 5 6 3 0 3
+    echo -n "08 "; java UnsafeMemory Unsynchronized 8 1000000 6 5 6 3 0 3
+    echo -n "16 "; java UnsafeMemory Unsynchronized 16 1000000 6 5 6 3 0 3
+    echo -n "32 "; java UnsafeMemory Unsynchronized 32 1000000 6 5 6 3 0 3
+#+END_SRC
+
+  #+RESULTS:
+  |  1 | Threads | average |  51.242 | ns/transition |
+  |  2 | Threads | average | 130.572 | ns/transition |
+  |  4 | Threads | average | 341.009 | ns/transition |
+  |  8 | Threads | average | 724.541 | ns/transition |
+  | 16 | Threads | average | 1408.67 | ns/transition |
+  | 32 | Threads | average |  2642.2 | ns/transition |
+
