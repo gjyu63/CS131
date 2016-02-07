@@ -301,21 +301,31 @@ echo -n "32: "; java UnsafeMemory Null 32 1000000 8 1 1 1 1 1
         s = new UnsynchronizedState(stateArg, maxval);
   #+END_SRC
 
+** Running Unsynchronized
+   There is a problem with the way that unsynchronized works. When we
+   increase the number of threads or swaps beyond an arbitrary value
+   the likelihood that the program will become deadlocked increases.
+   Thus, for these tests we used orders of magnitude smaller swaps
+   than previous tests:
+
   #+BEGIN_SRC sh :result output
     cd files/executables;
-    echo -n "01 "; java UnsafeMemory Unsynchronized 1 1000000 6 5 6 3 0 3
-    echo -n "02 "; java UnsafeMemory Unsynchronized 2 1000000 6 5 6 3 0 3
-    echo -n "04 "; java UnsafeMemory Unsynchronized 4 1000000 6 5 6 3 0 3
-    echo -n "08 "; java UnsafeMemory Unsynchronized 8 1000000 6 5 6 3 0 3
-    echo -n "16 "; java UnsafeMemory Unsynchronized 16 1000000 6 5 6 3 0 3
-    echo -n "32 "; java UnsafeMemory Unsynchronized 32 1000000 6 5 6 3 0 3
-#+END_SRC
+    echo -n "01 "; java UnsafeMemory Unsynchronized 1 1000 6 5 6 3 0 3
+    echo -n "02 "; java UnsafeMemory Unsynchronized 2 1000 6 5 6 3 0 3
+    echo -n "04 "; java UnsafeMemory Unsynchronized 4 1000 6 5 6 3 0 3
+    echo -n "08 "; java UnsafeMemory Unsynchronized 8 1000 6 5 6 3 0 3
+    echo -n "16 "; java UnsafeMemory Unsynchronized 16 1000 6 5 6 3 0 3
+    echo -n "32 "; java UnsafeMemory Unsynchronized 32 1000 6 5 6 3 0 3
+  #+END_SRC
 
   #+RESULTS:
-  |  1 | Threads | average |  51.242 | ns/transition |
-  |  2 | Threads | average | 130.572 | ns/transition |
-  |  4 | Threads | average | 341.009 | ns/transition |
-  |  8 | Threads | average | 724.541 | ns/transition |
-  | 16 | Threads | average | 1408.67 | ns/transition |
-  | 32 | Threads | average |  2642.2 | ns/transition |
+   sum mismatch (17 != 21)
+   sum mismatch (17 != 18)
+   sum mismatch (17 != 21)
+   sum mismatch (17 != 19)
+   sum mismatch (17 != 11)
+
+As expected, our unsynchronized class runs into race conditions, where we
+get unexpected unreliable values.
+
 
