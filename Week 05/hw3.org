@@ -328,4 +328,78 @@ echo -n "32: "; java UnsafeMemory Null 32 1000000 8 1 1 1 1 1
 As expected, our unsynchronized class runs into race conditions, where we
 get unexpected unreliable values.
 
+* GetNSet
 
+With the problematic /unsynchronized/ class implemented, we want
+to achieve similar speed but without the race conditions. Is that
+possible? Lets implement Java's atomic integer array and see if
+we can do any better. A definition provided on Wikipedia states
+that an atomic operation is one that is a guarantee of isolation
+from concurrent processes. Since we'll be using the
+AtomicIntegerArray class, lets include it in our file and
+declare a variable ~valueIntegerArray~ that we'll instantiate
+in our constructor:
+
+#+BEGIN_SRC java :tangle files/GetNSet.java
+  import java.util.concurrent.atomic.AtomicIntegerArray;
+
+  class GetNSet implements State {
+      private int[] value;
+      private byte maxval;
+      private AtomicIntegerArray valueIntegerArray;
+#+END_SRC
+
+With the variable declared above, we'd like to instantiate
+an instance of the class; however, looking at the documentation
+for AtomicIntegerArray shows us that we need to pass in an
+integer array, not a byte array. Thus, we'll want to repurpose
+~value~ as an ~int~ array and run a loop that will set each
+element its equivalent in the byte array:
+
+#+BEGIN_SRC java :tangle files/GetNSet.java
+  GetNSet(byte[] v) {
+      value = new int[v.length];
+
+      for(int i = 0; i < value.length; i++){
+          value[i] = v[i];
+      }
+      
+      maxval = 127;
+      valueIntegerArray = new AtomicIntegerArray(value);
+  }
+
+  GetNSet(byte[] v, byte m) { 
+      value = new int[v.length];
+
+      for(int i = 0; i < value.length; i++){
+          value[i] = v[i];
+      }
+      
+      maxval = m;
+      valueIntegerArray = new AtomicIntegerArray(value);
+  }
+
+  public int size() { return value.length; }
+
+  public byte[] current() {
+      byte[] tmp = new byte[value.length];
+
+      for(int i = 0; i < tmp.length; i++){
+          tmp[i] = (byte) value[i];
+      }
+
+      return tmp;
+  }
+#+END_SRC
+
+#+BEGIN_SRC java :tangle files/GetNSet.java
+      public boolean swap(int i, int j) {
+          if (value[i] <= 0 || value[j] >= maxval) {
+              return false;
+          }
+          value[i]--;
+          value[j]++;
+          return true;
+      }
+  }
+#+END_SRC
