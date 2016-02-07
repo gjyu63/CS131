@@ -378,8 +378,16 @@ element its equivalent in the byte array:
       maxval = m;
       valueIntegerArray = new AtomicIntegerArray(value);
   }
+#+END_SRC
 
-  public int size() { return value.length; }
+With the constructors that correctly instantiate our AtomIntegerArray
+we can change the size method so that it gets the AtomicIntegerArray
+length. We just call its ~length~ method. The ~current~ method requires
+us to return a ~byte~ array, so we'll need to create a temporary
+byte array and return it:
+
+#+BEGIN_SRC java :tangle files/GetNSet.java
+  public int size() { return valueIntegerArray.length(); }
 
   public byte[] current() {
       byte[] tmp = new byte[value.length];
@@ -387,18 +395,21 @@ element its equivalent in the byte array:
       for(int i = 0; i < tmp.length; i++){
           tmp[i] = (byte) value[i];
       }
-
+      
       return tmp;
   }
 #+END_SRC
 
+Finally, the ~swap~ function needs to use the ~get~ and ~set~ methods
+provided by the AtomicIntegerArray class:
+
 #+BEGIN_SRC java :tangle files/GetNSet.java
       public boolean swap(int i, int j) {
-          if (value[i] <= 0 || value[j] >= maxval) {
+          if (valueIntegerArray.get(i) <= 0 || valueIntegerArray.get(j) >= maxval) {
               return false;
           }
-          value[i]--;
-          value[j]++;
+          valueIntegerArray.getAndDecrement(i);
+          valueIntegerArray.getAndIncrement(j);
           return true;
       }
   }
