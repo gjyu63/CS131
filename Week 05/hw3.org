@@ -453,6 +453,7 @@ provided by the AtomicIntegerArray class:
    | 32 | Threads | average | 3769.83 | ns/transition |
 
 * BetterSafe
+** Writing the class
 We can now move to the BetterSafe model, which will
 achieve better performance than /Synchronized/ but
 still maintain 100% reliability. We will be able to
@@ -510,3 +511,42 @@ no thread steps on anyone else's toes:
                               }
   }
 #+END_SRC
+** Testing BetterSafe
+Let's test our BetterSafe class by performing the same tests
+that we've done in the past:
+
+#+BEGIN_SRC sh :output results
+  cd files/executables;
+  echo "orginal test:"
+  echo -n "01 "; java UnsafeMemory BetterSafe 1 1000000 6 5 6 3 0 3
+  echo -n "02 "; java UnsafeMemory BetterSafe 2 1000000 6 5 6 3 0 3
+  echo -n "04 "; java UnsafeMemory BetterSafe 4 1000000 6 5 6 3 0 3
+  echo -n "08 "; java UnsafeMemory BetterSafe 8 1000000 6 5 6 3 0 3
+  echo -n "16 "; java UnsafeMemory BetterSafe 16 1000000 6 5 6 3 0 3
+  echo -n "32 "; java UnsafeMemory BetterSafe 32 1000000 6 5 6 3 0 3
+
+  echo "larger test:"
+  echo -n "01 "; java UnsafeMemory BetterSafe 1 1000000 6 5 6 3 0 3
+  echo -n "02 "; java UnsafeMemory BetterSafe 2 1000000 6 5 6 3 0 3
+  echo -n "04 "; java UnsafeMemory BetterSafe 4 1000000 6 5 6 3 0 3
+  echo -n "08 "; java UnsafeMemory BetterSafe 8 1000000 6 5 6 3 0 3
+  echo -n "16 "; java UnsafeMemory BetterSafe 16 1000000 6 5 6 3 0 3
+  echo -n "32 "; java UnsafeMemory BetterSafe 32 1000000 6 5 6 3 0 3
+#+END_SRC
+
+#+RESULTS:
+| orginal | test:   |         |         |               |
+|       1 | Threads | average | 79.9405 | ns/transition |
+|       2 | Threads | average | 1003.66 | ns/transition |
+|       4 | Threads | average | 572.069 | ns/transition |
+|       8 | Threads | average | 1194.61 | ns/transition |
+|      16 | Threads | average | 2515.44 | ns/transition |
+|      32 | Threads | average | 5913.67 | ns/transition |
+|  larger | test:   |         |         |               |
+|       1 | Threads | average | 80.0281 | ns/transition |
+|       2 | Threads | average | 1067.41 | ns/transition |
+|       4 | Threads | average |  601.73 | ns/transition |
+|       8 | Threads | average | 1198.49 | ns/transition |
+|      16 | Threads | average | 2542.19 | ns/transition |
+|      32 | Threads | average | 5915.93 | ns/transition |
+
