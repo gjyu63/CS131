@@ -452,3 +452,55 @@ provided by the AtomicIntegerArray class:
    | 32 | Threads | average | 6963.54 | ns/transition |
    | 32 | Threads | average | 3769.83 | ns/transition |
 
+* BetterSafe
+We can now move to the BetterSafe model, which will
+achieve better performance than /Synchronized/ but
+still maintain 100% reliability. We will be able to
+do this by implementing a system of locks and unlocks.
+
+We begin with our familiar code from /Synchronized/,
+maintaining a majority of the code. Thus, we only
+change the name of the class along with the constructor
+names to reflect this change. Finally, we'll add a
+lock to use when we are performing a swap:
+
+#+BEGIN_SRC java :tangle files/BetterSafe.java
+  import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+  class BetterSafe implements State {
+      private byte[] value;
+      private byte maxval;
+      private final ReentrantReadWriteLock swapLock = new ReentrantReadWriteLock();
+
+      BetterSafe(byte[] v) { value = v; maxval = 127; }
+
+      BetterSafe(byte[] v, byte m) { value = v; maxval = m; }
+#+END_SRC
+
+We'll remove the ~synchronized~ keyword from the swap
+function and implement a use of locks to make sure that
+no thread steps on anyone else's toes: 
+
+#+BEGIN_SRC java :tangle files/BetterSafe.java
+
+  public int size() { return value.length; }
+
+  public byte[] current() { return value; }
+
+  public boolean swap(int i, int j) {
+      swapLock.writeLock().lock();
+      swapLock.readLock().lock();
+      
+      if (value[i] <= 0 || value[j] >= maxval) {
+          return false;
+      }
+      value[i]--;
+      value[j]++;
+
+      swapLock.writeLock().unlock();
+      swapLock.readLock().unlock();
+      
+      return true;
+                              }
+  }
+#+END_SRC
