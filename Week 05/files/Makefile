@@ -1,7 +1,7 @@
 JC = javac
 OUTPUT = executables/
 
-all: nullstate swaptest synchronized_state state unsafe_memory unsynchronized_state get_n_set
+all: nullstate swaptest synchronized_state state unsafe_memory unsynchronized_state get_n_set better_safe
 
 # All classes for this assingnment
 nullstate : NullState.java
@@ -14,6 +14,8 @@ unsynchronized_state : UnsynchronizedState.java unsafe_memory
 	$(JC) -d $(OUTPUT) UnsynchronizedState.java
 get_n_set : GetNSet.java unsafe_memory
 	$(JC) -d $(OUTPUT) GetNSet.java
+better_safe : BetterSafe.java unsafe_memory
+	$(JC) -d $(OUTPUT) BetterSafe.java
 state: State.java
 	$(JC) -d $(OUTPUT) State.java
 unsafe_memory: UnsafeMemory.java
