@@ -12,6 +12,8 @@ synchronized_state : SynchronizedState.java
 	$(JC) -d $(OUTPUT) SynchronizedState.java
 unsynchronized_state : UnsynchronizedState.java unsafe_memory
 	$(JC) -d $(OUTPUT) UnsynchronizedState.java
+get_n_set : GetNSet unsafe_memory
+	$(JC) -d $(OUTPUT) GetNSet.java
 state: State.java
 	$(JC) -d $(OUTPUT) State.java
 unsafe_memory: UnsafeMemory.java
