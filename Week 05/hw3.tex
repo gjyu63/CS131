@@ -1,4 +1,4 @@
-% Created 2016-02-07 Sun 19:06
+% Created 2016-02-07 Sun 19:20
 \documentclass[11pt]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -16,14 +16,15 @@
 \usepackage{amssymb}
 \usepackage{hyperref}
 \tolerance=1000
+\usepackage{minted}
 \usemintedstyle{tango}
-\author{Ryan Karim Sharif}
+\author{Ryan Sharif}
 \date{\today}
 \title{Breaking and fixing the Java Memory Model for profit}
 \hypersetup{
   pdfkeywords={},
   pdfsubject={},
-  pdfcreator={Emacs 24.5.1 (Org mode 8.2.10)}}
+  pdfcreator={Emacs 24.4.1 (Org mode 8.2.10)}}
 \begin{document}
 
 \maketitle
@@ -41,9 +42,9 @@ let's make sure that we have our environment variables and
 an appropriate version of Java. I'll be using a local copy
 of JDK version 1.8.071:
 
-\begin{verbatim}
+\begin{minted}[]{sh}
 java -version
-\end{verbatim}
+\end{minted}
 Java(TM) SE Runtime Environment (build 1.8.0$_{\text{71}}$-b15)
 Java HotSpot(TM) 64-Bit Server VM (build 25.71-b15, mixed mode)
 \subsubsection{CPU information}
@@ -54,9 +55,9 @@ machine reports a single core. This may or may not affect the way
 interleaved CPU instructions are executed on several cores. Thus,
 I will run my code locally and on UCLA's SEASNET servers. 
 
-\begin{verbatim}
+\begin{minted}[]{sh}
 less /proc/cpuinfo
-\end{verbatim}
+\end{minted}
 \subsubsection{Memory Information}
 \label{sec-1-1-3}
 We can similarly inspect our machine's memory information by look at
@@ -70,9 +71,9 @@ The files that we'll need for this assignment are compressed in
 the `jmm.jar' file. Thus, we'll need to decompress the jar file
 before we can do anything else:
 
-\begin{verbatim}
+\begin{minted}[]{sh}
 jar -xvf executables/jmm.jar
-\end{verbatim}
+\end{minted}
 created:   META-INF/              
 inflated:  META-INF/MANIFEST.MF   
 inflated:  NullState.java         
@@ -85,7 +86,7 @@ inflated:  UnsafeMemory.java
 Compiling the source files into executable class files will become tedious.
 We can automate this process using a Makefile:
 
-\begin{verbatim}
+\begin{minted}[]{make}
 JC = javac
 OUTPUT = executables/
 
@@ -105,7 +106,7 @@ unsafe_memory: UnsafeMemory.java
 
 clean:
 	rm $(OUTPUT)*
-\end{verbatim}
+\end{minted}
 \subsection{Testing}
 \label{sec-2-3}
 With the prerequisite files and environment variables all in order, we
@@ -185,7 +186,7 @@ is being done.
 32 Threads average 8696.07 ns/transition
 \end{verbatim}
 
-\begin{verbatim}
+\begin{minted}[]{sh}
 cd files/executables;
 echo "second test set";
 echo -n "01: "; java UnsafeMemory Null 1 1000000 2 1 1 0 0 1
@@ -194,7 +195,7 @@ echo -n "04: "; java UnsafeMemory Null 4 1000000 2 1 1 0 0 1
 echo -n "08: "; java UnsafeMemory Null 8 1000000 2 1 1 0 0 1
 echo -n "16: "; java UnsafeMemory Null 16 1000000 2 1 1 0 0 1
 echo -n "32: "; java UnsafeMemory Null 32 1000000 2 1 1 0 0 1
-\end{verbatim}
+\end{minted}
 
 
 \begin{verbatim}
@@ -216,11 +217,11 @@ UnsynchronizedState and letting the Java compiler know that we'll be
 implementing the class State. This means we'll have to take all the
 method signatures from State and actually implement them here:
 
-\begin{verbatim}
+\begin{minted}[]{java}
 class UnsynchronizedState implements State {
     private byte[] value;
     private byte maxval;
-\end{verbatim}
+\end{minted}
 
 Similar to the synchronized version, we'll have two constructors: a
 constructor that receives an array to initialize to some value, and
@@ -228,16 +229,16 @@ sets the maximum value for the object to 127. We also have a second
 constructor that similarly takes in an array but also takes in a
 byte, setting the maximum value for this object to m.
 
-\begin{verbatim}
+\begin{minted}[]{java}
 UnsynchronizedState(byte[] v) { value = v; maxval = 127; }
 
 UnsynchronizedState(byte[] v, byte m) { value = v; maxval = m; }
-\end{verbatim}
+\end{minted}
 
 The key change to the class is simply a removal of the keyword
 \verb~synchronized~ from the definition of the swap method:
 
-\begin{verbatim}
+\begin{minted}[]{java}
     public int size() { return value.length; }
 
     public byte[] current() { return value; }
@@ -251,22 +252,22 @@ The key change to the class is simply a removal of the keyword
 	return true;
     }
 }
-\end{verbatim}
+\end{minted}
 
 We can compile our class and test it like the other two we've
 tested before:
 
-\begin{verbatim}
+\begin{minted}[]{sh}
 cd files;
 make unsynchronized_state
-\end{verbatim}
+\end{minted}
 
 Finally, before we can run our program again, we need to ensure that
 our program knows how to use the new class by adding two lines of code:
-\begin{verbatim}
+\begin{minted}[]{java}
 else if (args[0].equals("Unsynchronized"))
     s = new UnsynchronizedState(stateArg, maxval);
-\end{verbatim}
+\end{minted}
 
 \subsection{Running Unsynchronized}
 \label{sec-3-1}
@@ -305,14 +306,14 @@ AtomicIntegerArray class, lets include it in our file and
 declare a variable \verb~valueIntegerArray~ that we'll instantiate
 in our constructor:
 
-\begin{verbatim}
+\begin{minted}[]{java}
 import java.util.concurrent.atomic.AtomicIntegerArray;
 
 class GetNSet implements State {
     private int[] value;
     private byte maxval;
     private AtomicIntegerArray valueIntegerArray;
-\end{verbatim}
+\end{minted}
 
 With the variable declared above, we'd like to instantiate
 an instance of the class; however, looking at the documentation
@@ -321,7 +322,7 @@ integer array, not a byte array. Thus, we'll want to repurpose
 \verb~value~ as an \verb~int~ array and run a loop that will set each
 element its equivalent in the byte array:
 
-\begin{verbatim}
+\begin{minted}[]{java}
 GetNSet(byte[] v) {
     value = new int[v.length];
 
@@ -343,7 +344,7 @@ GetNSet(byte[] v, byte m) {
     maxval = m;
     valueIntegerArray = new AtomicIntegerArray(value);
 }
-\end{verbatim}
+\end{minted}
 
 With the constructors that correctly instantiate our AtomIntegerArray
 we can change the size method so that it gets the AtomicIntegerArray
@@ -351,7 +352,7 @@ length. We just call its \verb~length~ method. The \verb~current~ method require
 us to return a \verb~byte~ array, so we'll need to create a temporary
 byte array and return it:
 
-\begin{verbatim}
+\begin{minted}[]{java}
 public int size() { return valueIntegerArray.length(); }
 
 public byte[] current() {
@@ -363,12 +364,12 @@ public byte[] current() {
 
     return tmp;
 }
-\end{verbatim}
+\end{minted}
 
 Finally, the \verb~swap~ function needs to use the \verb~get~ and \verb~set~ methods
 provided by the AtomicIntegerArray class:
 
-\begin{verbatim}
+\begin{minted}[]{java}
     public boolean swap(int i, int j) {
 	if (valueIntegerArray.get(i) <= 0 || valueIntegerArray.get(j) >= maxval) {
 	    return false;
@@ -378,12 +379,12 @@ provided by the AtomicIntegerArray class:
 	return true;
     }
 }
-\end{verbatim}
+\end{minted}
 \subsection{Results}
 \label{sec-4-2}
 Let's run this class, the same way we've done before:
 
-\begin{verbatim}
+\begin{minted}[]{sh}
 cd files/executables;
 echo -n "01 "; java UnsafeMemory GetNSet 1 1000000 6 5 6 3 0 3
 echo -n "02 "; java UnsafeMemory GetNSet 2 1000000 6 5 6 3 0 3
@@ -391,7 +392,7 @@ echo -n "04 "; java UnsafeMemory GetNSet 4 1000000 6 5 6 3 0 3
 echo -n "08 "; java UnsafeMemory GetNSet 8 1000000 6 5 6 3 0 3
 echo -n "16 "; java UnsafeMemory GetNSet 16 1000000 6 5 6 3 0 3
 echo -n "32 "; java UnsafeMemory GetNSet 32 1000000 6 5 6 3 0 3
-\end{verbatim}
+\end{minted}
 
 Like our previous results, we'd expect that the more threads we add
 the faster our program should run; however, it looks like the overhead
@@ -422,7 +423,7 @@ change the name of the class along with the constructor
 names to reflect this change. Finally, we'll add a
 lock to use when we are performing a swap:
 
-\begin{verbatim}
+\begin{minted}[]{java}
 import java.util.concurrent.locks.ReentrantLock;
 
 class BetterSafe implements State {
@@ -439,13 +440,13 @@ class BetterSafe implements State {
 	value = v; maxval = m;
 	swapLock = new ReentrantLock();
     }
-\end{verbatim}
+\end{minted}
 
 We'll remove the \verb~synchronized~ keyword from the swap
 function and implement a use of locks to make sure that
 no thread steps on anyone else's toes: 
 
-\begin{verbatim}
+\begin{minted}[]{java}
 public int size() { return value.length; }
 
 public byte[] current() { return value; }
@@ -466,7 +467,7 @@ public boolean swap(int i, int j) {
     return true;
 			    }
 }
-\end{verbatim}
+\end{minted}
 \subsection{Testing BetterSafe}
 \label{sec-5-2}
 Let's test our BetterSafe class by performing the same tests
@@ -495,14 +496,14 @@ larger & test: &  &  & \\
 \label{sec-6}
 \subsection{Writing BetterSorry}
 \label{sec-6-1}
-\begin{verbatim}
+\begin{minted}[]{java}
 import java.util.concurrent.TimeUnit;
 
 class BetterSorry implements State {
     private volatile byte[] value;
     private byte maxval;
     private static volatile boolean inCritical = false;
-\end{verbatim}
+\end{minted}
 
 Similar to the synchronized version, we'll have two constructors: a
 constructor that receives an array to initialize to some value, and
@@ -513,18 +514,18 @@ psuedo-lock by creating a boolean that lets us know when we're in
 a critical part of the execution, i.e., when we're writing to our
 array.
 
-\begin{verbatim}
+\begin{minted}[]{java}
 BetterSorry(byte[] v) { value = v; maxval = 127; }
 
 BetterSorry(byte[] v, byte m) { value = v; maxval = m; }
-\end{verbatim}
+\end{minted}
 
 To make sure we don't have any deadlocks, we'll check to make
 sure we are not in a critical section, i.e., writing to
 our array. If we are, we'll wait our turn. If not, then the
 thread will write what it needs to the array.
 
-\begin{verbatim}
+\begin{minted}[]{java}
     public int size() { return value.length; }
 
     public byte[] current() { return value; }
@@ -555,7 +556,7 @@ thread will write what it needs to the array.
 	return true;
     }
 }
-\end{verbatim}
+\end{minted}
 \subsection{Testing BetterSorry}
 \label{sec-6-2}
 
@@ -572,5 +573,5 @@ sum mismatch (17 != 23) &  &  &  & \\
 sum mismatch (17 != 24) &  &  &  & \\
 \end{tabular}
 \end{center}
-% Emacs 24.5.1 (Org mode 8.2.10)
+% Emacs 24.4.1 (Org mode 8.2.10)
 \end{document}
