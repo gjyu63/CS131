@@ -4,3 +4,6 @@
 # ignore tex files for now
 *.tex
 *.pdf
+
+# Java compiled class files
+*.class
