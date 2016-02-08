@@ -85,7 +85,7 @@ threads. In fact, the more cores we add, the worse our program
 performs. Given, these results, I will move over to the SEASNET
 servers to test application peformance on a multicore machine.
 
-#+BEGIN_SRC sh :result output
+#+BEGIN_SRC sh :results output :exports results
 cd files/executables;
 java UnsafeMemory Synchronized 1 1000000 6 5 6 3 0 3
 java UnsafeMemory Synchronized 2 1000000 6 5 6 3 0 3
@@ -108,7 +108,7 @@ application on the SEASNET servers. The results from
 the SEASNET servers run approximately twice as fast
 as the results my local machine produced. 
 
-#+BEGIN_SRC sh :result output
+#+BEGIN_SRC sh :results output :exports results
 cd files/executables;
 echo "Synchronized tests"; echo "first test set"
 echo -n "01: "; java UnsafeMemory Synchronized 1 1000000 6 5 6 3 0 3
@@ -129,7 +129,7 @@ echo -n "32: ";java UnsafeMemory Synchronized 32 1000000 6 5 6 3 0 3
 |          16: | Threads | average |  1634.2 | ns/transition |
 |          32: | Threads | average | 4202.26 | ns/transition |
 
-#+BEGIN_SRC sh :result output
+#+BEGIN_SRC sh :results output :exports results
 cd files/executables;
 echo "second test set";
 echo -n "01: "; java UnsafeMemory Synchronized 1 1000000 2 1 1 0 0 1
@@ -149,7 +149,7 @@ echo -n "32: "; java UnsafeMemory Synchronized 32 1000000 2 1 1 0 0 1
 |    16: | Threads | average |  2768.9 | ns/transition |
 |    32: | Threads | average | 4956.99 | ns/transition |
 
-#+BEGIN_SRC sh :result output
+#+BEGIN_SRC sh :results output :exports results
 cd files/executables;
 echo "thirds test set";
 echo -n "01: "; java UnsafeMemory Synchronized 1 1000000 8 1 1 1 1 1
@@ -179,7 +179,7 @@ at least on this local machine adds considerable running
 time to our program despite the fact that no actual work
 is being done.
 
-#+BEGIN_SRC sh :result output
+#+BEGIN_SRC sh :results output :exports results
 cd files/executables;
 echo -n "01 "; java UnsafeMemory Null 1 1000000 6 5 6 3 0 3
 echo -n "02 "; java UnsafeMemory Null 2 1000000 6 5 6 3 0 3
@@ -197,7 +197,7 @@ echo -n "32 "; java UnsafeMemory Null 32 1000000 6 5 6 3 0 3
 | 16  Threads | average  1400.48  ns/transition |
 | 32  Threads | average  1701.61  ns/transition |
 
-#+BEGIN_SRC sh :result output
+#+BEGIN_SRC sh :results output exports: results
 cd files/executables;
 echo "second test set";
 echo -n "01: "; java UnsafeMemory Null 1 1000000 2 1 1 0 0 1
@@ -218,7 +218,7 @@ echo -n "32: "; java UnsafeMemory Null 32 1000000 2 1 1 0 0 1
 |    32: | Threads | average |  1673.4 | ns/transition |
 
 
-#+BEGIN_SRC sh :result output
+#+BEGIN_SRC sh :results output :exports results
 cd files/executables;
 echo "thirds test set";
 echo -n "01: "; java UnsafeMemory Null 1 1000000 8 1 1 1 1 1
@@ -308,7 +308,7 @@ echo -n "32: "; java UnsafeMemory Null 32 1000000 8 1 1 1 1 1
    Thus, for these tests we used orders of magnitude smaller swaps
    than previous tests:
 
-  #+BEGIN_SRC sh :result output
+  #+BEGIN_SRC sh :results output :exports results
     cd files/executables;
     echo -n "01 "; java UnsafeMemory Unsynchronized 1 1000 6 5 6 3 0 3
     echo -n "02 "; java UnsafeMemory Unsynchronized 2 1000 6 5 6 3 0 3
@@ -417,7 +417,7 @@ provided by the AtomicIntegerArray class:
 ** Results
    Let's run this class, the same way we've done before:
 
-   #+BEGIN_SRC sh :output results
+   #+BEGIN_SRC sh :output results exports: results
      cd files/executables;
      echo -n "01 "; java UnsafeMemory GetNSet 1 1000000 6 5 6 3 0 3
      echo -n "02 "; java UnsafeMemory GetNSet 2 1000000 6 5 6 3 0 3
@@ -442,7 +442,7 @@ provided by the AtomicIntegerArray class:
    on an array two and three orders of magnitude larger produces no
    bad results:
 
-   #+BEGIN_SRC sh :output results
+   #+BEGIN_SRC sh :output results :exports results
      cd files/executables;
      echo -n "32 "; java UnsafeMemory GetNSet 32 10000000 6 5 6 3 0 3
      echo -n "32 "; java UnsafeMemory GetNSet 32 100000000 6 5 6 3 0 3
@@ -515,7 +515,7 @@ no thread steps on anyone else's toes:
 Let's test our BetterSafe class by performing the same tests
 that we've done in the past:
 
-#+BEGIN_SRC sh :output results
+#+BEGIN_SRC sh :output results :exports results
   cd files/executables;
   echo "orginal test:"
   echo -n "01 "; java UnsafeMemory BetterSafe 1 1000000 6 5 6 3 0 3
