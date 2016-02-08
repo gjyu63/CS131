@@ -1,6 +1,52 @@
 #+TITLE: Breaking and fixing the Java Memory Model for profit
 #+LaTeX_HEADER: \usemintedstyle{tango}
 
+* Answers and Summary
+For the benefit of the T.A.s, I summarize my results and
+findings for this homework before any of the material is
+presented. This is because I have included an extensive
+write up of the homework. Thus, this summary will attempt
+to meet the requirements of the homework specification,
+while the details for these findings are found in the
+pages that follow.
+
+The ~Synchronized~ and ~Null~ models provide a baseline
+to begin our analysis. Looking at the results in the
+following pages, we can see that the ~Null~ model runs
+around two to three times faster than ~Synchronized~.
+Thus, if our class implementations are done right, we
+want to find ourselves somewhere in between these two
+models. The Unsynchronized model, when it does not deadlock
+should run at about the same speed as ~Null~; however,
+I was never able to get it to complete the entire test
+suite because of lockups. Hence, it results appear to
+be significantly slower. But this is only because the
+number of swaps is significantly smaller than the ones
+we've done on the previous two models.
+
+We avoid deadlocks and erronous ouput using the ~AtomicIntegerArray~
+API that Java provides for us for our ~GetNSet~ model.  As the
+specification indicates, it runs at a speed that is in between ~Null~
+and ~Synchronized~. This is probably due to overhead that
+~Synchronized~ imposes on the execution of a method. Thus, this is a
+desirable outcome for our company GDI. The implementation and
+execution of ~BetterSafe~ is similarly faster than ~Synchronized~.
+In fact, ~BetterSafe~ runs almost 2.5x faster than ~Synchronized~.
+This model uses Java's Reentrant lock API. Since its overhead appears
+to be much smaller than ~Synchronized~, it achieves faster over
+run time. Still, with this speed up, it is able to maintain 
+error-free results.
+
+Finally, if our company GDI wants speed at the expense of a little
+accuracy, the best model is ~BetterSorry~ as it achieves speeds
+as fast as ~Null~, while sacrificing a little bit of accuracy.
+I achieved this by creating a ~static volatile~ boolean that gets
+flipped on and off when the program is executing critical portions
+of code, i.e., writing to memory. It still contains race conditions
+during reads, though these have been minimized to a maximum of two
+instructions. A program that increases the liklihood of race conditions
+is one that invokes a higher and higher number of threads.
+
 * Introduction
 ** Checking environment variables and Java version
 *** Java version

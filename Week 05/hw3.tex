@@ -1,4 +1,4 @@
-% Created 2016-02-07 Sun 19:20
+% Created 2016-02-07 Sun 19:53
 \documentclass[11pt]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -31,12 +31,59 @@
 \tableofcontents
 
 
-\section{Introduction}
+\section{Answers and Summary}
 \label{sec-1}
+For the benefit of the T.A.s, I summarize my results and
+findings for this homework before any of the material is
+presented. This is because I have included an extensive
+write up of the homework. Thus, this summary will attempt
+to meet the requirements of the homework specification,
+while the details for these findings are found in the
+pages that follow.
+
+The \verb~Synchronized~ and \verb~Null~ models provide a baseline
+to begin our analysis. Looking at the results in the
+following pages, we can see that the \verb~Null~ model runs
+around two to three times faster than \verb~Synchronized~.
+Thus, if our class implementations are done right, we
+want to find ourselves somewhere in between these two
+models. The Unsynchronized model, when it does not deadlock
+should run at about the same speed as \verb~Null~; however,
+I was never able to get it to complete the entire test
+suite because of lockups. Hence, it results appear to
+be significantly slower. But this is only because the
+number of swaps is significantly smaller than the ones
+we've done on the previous two models.
+
+We avoid deadlocks and erronous ouput using the \verb~AtomicIntegerArray~
+API that Java provides for us for our \verb~GetNSet~ model.  As the
+specification indicates, it runs at a speed that is in between \verb~Null~
+and \verb~Synchronized~. This is probably due to overhead that
+\verb~Synchronized~ imposes on the execution of a method. Thus, this is a
+desirable outcome for our company GDI. The implementation and
+execution of \verb~BetterSafe~ is similarly faster than \verb~Synchronized~.
+In fact, \verb~BetterSafe~ runs almost 2.5x faster than \verb~Synchronized~.
+This model uses Java's Reentrant lock API. Since its overhead appears
+to be much smaller than \verb~Synchronized~, it achieves faster over
+run time. Still, with this speed up, it is able to maintain 
+error-free results.
+
+Finally, if our company GDI wants speed at the expense of a little
+accuracy, the best model is \verb~BetterSorry~ as it achieves speeds
+as fast as \verb~Null~, while sacrificing a little bit of accuracy.
+I achieved this by creating a \verb~static volatile~ boolean that gets
+flipped on and off when the program is executing critical portions
+of code, i.e., writing to memory. It still contains race conditions
+during reads, though these have been minimized to a maximum of two
+instructions. A program that increases the liklihood of race conditions
+is one that invokes a higher and higher number of threads.
+
+\section{Introduction}
+\label{sec-2}
 \subsection{Checking environment variables and Java version}
-\label{sec-1-1}
+\label{sec-2-1}
 \subsubsection{Java version}
-\label{sec-1-1-1}
+\label{sec-2-1-1}
 Before we get started doing anything else in the assignment,
 let's make sure that we have our environment variables and
 an appropriate version of Java. I'll be using a local copy
@@ -48,7 +95,7 @@ java -version
 Java(TM) SE Runtime Environment (build 1.8.0$_{\text{71}}$-b15)
 Java HotSpot(TM) 64-Bit Server VM (build 25.71-b15, mixed mode)
 \subsubsection{CPU information}
-\label{sec-1-1-2}
+\label{sec-2-1-2}
 We can look at our CPU information using \verb~less~ to see that we will
 be using an Inter Core i3 Processor running at 3.3GHz. My particular
 machine reports a single core. This may or may not affect the way
@@ -59,14 +106,14 @@ I will run my code locally and on UCLA's SEASNET servers.
 less /proc/cpuinfo
 \end{minted}
 \subsubsection{Memory Information}
-\label{sec-1-1-3}
+\label{sec-2-1-3}
 We can similarly inspect our machine's memory information by look at
 the `/proc/meminfo' file, which tells me that I have 764300 kB of
 memory total.
 \section{Running the tests}
-\label{sec-2}
+\label{sec-3}
 \subsection{Extracting jmm.jar}
-\label{sec-2-1}
+\label{sec-3-1}
 The files that we'll need for this assignment are compressed in 
 the `jmm.jar' file. Thus, we'll need to decompress the jar file
 before we can do anything else:
@@ -82,7 +129,7 @@ inflated:  SwapTest.java
 inflated:  SynchronizedState.java 
 inflated:  UnsafeMemory.java      
 \subsection{Makefile}
-\label{sec-2-2}
+\label{sec-3-2}
 Compiling the source files into executable class files will become tedious.
 We can automate this process using a Makefile:
 
@@ -108,13 +155,13 @@ clean:
 	rm $(OUTPUT)*
 \end{minted}
 \subsection{Testing}
-\label{sec-2-3}
+\label{sec-3-3}
 With the prerequisite files and environment variables all in order, we
 can begin testing and working on the assignment. We'll begin our tests
 on the Synchronized implementation, moving over to the Null model
 afterwards.
 \subsubsection{Synchronized model}
-\label{sec-2-3-1}
+\label{sec-3-3-1}
 Here we test the synchronized model first. The initial results on my
 local machine indicate that this program is not benefiting from more
 threads. In fact, the more cores we add, the worse our program
@@ -168,7 +215,7 @@ thirds test set
 
 
 \subsubsection{Null model}
-\label{sec-2-3-2}
+\label{sec-3-3-2}
 As indicated by the specification for this assignment, the
 Null model does not yet work but still passes the test,
 thus it runs to completion much faster than the synchronized
@@ -209,7 +256,7 @@ thirds test set
 \end{verbatim}
 
 \section{Unsynchronized implementation}
-\label{sec-3}
+\label{sec-4}
 We can begin implementing the unsynchronized model by bringing over
 the code from the synchronized model and tinkering with it. We will
 start with a basic class definition, naming the class
@@ -270,7 +317,7 @@ else if (args[0].equals("Unsynchronized"))
 \end{minted}
 
 \subsection{Running Unsynchronized}
-\label{sec-3-1}
+\label{sec-4-1}
 There is a problem with the way that unsynchronized works. When we
 increase the number of threads or swaps beyond an arbitrary value
 the likelihood that the program will become deadlocked increases.
@@ -293,9 +340,9 @@ As expected, our unsynchronized class runs into race conditions, where we
 get unexpected unreliable values.
 
 \section{GetNSet}
-\label{sec-4}
+\label{sec-5}
 \subsection{Writing the Class}
-\label{sec-4-1}
+\label{sec-5-1}
 With the problematic \emph{unsynchronized} class implemented, we want
 to achieve similar speed but without the race conditions. Is that
 possible? Lets implement Java's atomic integer array and see if
@@ -381,7 +428,7 @@ provided by the AtomicIntegerArray class:
 }
 \end{minted}
 \subsection{Results}
-\label{sec-4-2}
+\label{sec-5-2}
 Let's run this class, the same way we've done before:
 
 \begin{minted}[]{sh}
@@ -409,9 +456,9 @@ bad results:
 \end{center}
 
 \section{BetterSafe}
-\label{sec-5}
+\label{sec-6}
 \subsection{Writing the class}
-\label{sec-5-1}
+\label{sec-6-1}
 We can now move to the BetterSafe model, which will
 achieve better performance than \emph{Synchronized} but
 still maintain 100\% reliability. We will be able to
@@ -469,7 +516,7 @@ public boolean swap(int i, int j) {
 }
 \end{minted}
 \subsection{Testing BetterSafe}
-\label{sec-5-2}
+\label{sec-6-2}
 Let's test our BetterSafe class by performing the same tests
 that we've done in the past:
 
@@ -493,9 +540,9 @@ larger & test: &  &  & \\
 \end{center}
 
 \section{BetterSorry}
-\label{sec-6}
+\label{sec-7}
 \subsection{Writing BetterSorry}
-\label{sec-6-1}
+\label{sec-7-1}
 \begin{minted}[]{java}
 import java.util.concurrent.TimeUnit;
 
@@ -558,7 +605,7 @@ thread will write what it needs to the array.
 }
 \end{minted}
 \subsection{Testing BetterSorry}
-\label{sec-6-2}
+\label{sec-7-2}
 
 \begin{center}
 \begin{tabular}{rllrl}
