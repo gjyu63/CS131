@@ -1,0 +1,576 @@
+% Created 2016-02-07 Sun 19:06
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{fixltx2e}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{float}
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{textcomp}
+\usepackage{marvosym}
+\usepackage{wasysym}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\tolerance=1000
+\usemintedstyle{tango}
+\author{Ryan Karim Sharif}
+\date{\today}
+\title{Breaking and fixing the Java Memory Model for profit}
+\hypersetup{
+  pdfkeywords={},
+  pdfsubject={},
+  pdfcreator={Emacs 24.5.1 (Org mode 8.2.10)}}
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+
+\section{Introduction}
+\label{sec-1}
+\subsection{Checking environment variables and Java version}
+\label{sec-1-1}
+\subsubsection{Java version}
+\label{sec-1-1-1}
+Before we get started doing anything else in the assignment,
+let's make sure that we have our environment variables and
+an appropriate version of Java. I'll be using a local copy
+of JDK version 1.8.071:
+
+\begin{verbatim}
+java -version
+\end{verbatim}
+Java(TM) SE Runtime Environment (build 1.8.0$_{\text{71}}$-b15)
+Java HotSpot(TM) 64-Bit Server VM (build 25.71-b15, mixed mode)
+\subsubsection{CPU information}
+\label{sec-1-1-2}
+We can look at our CPU information using \verb~less~ to see that we will
+be using an Inter Core i3 Processor running at 3.3GHz. My particular
+machine reports a single core. This may or may not affect the way
+interleaved CPU instructions are executed on several cores. Thus,
+I will run my code locally and on UCLA's SEASNET servers. 
+
+\begin{verbatim}
+less /proc/cpuinfo
+\end{verbatim}
+\subsubsection{Memory Information}
+\label{sec-1-1-3}
+We can similarly inspect our machine's memory information by look at
+the `/proc/meminfo' file, which tells me that I have 764300 kB of
+memory total.
+\section{Running the tests}
+\label{sec-2}
+\subsection{Extracting jmm.jar}
+\label{sec-2-1}
+The files that we'll need for this assignment are compressed in 
+the `jmm.jar' file. Thus, we'll need to decompress the jar file
+before we can do anything else:
+
+\begin{verbatim}
+jar -xvf executables/jmm.jar
+\end{verbatim}
+created:   META-INF/              
+inflated:  META-INF/MANIFEST.MF   
+inflated:  NullState.java         
+inflated:  State.java             
+inflated:  SwapTest.java          
+inflated:  SynchronizedState.java 
+inflated:  UnsafeMemory.java      
+\subsection{Makefile}
+\label{sec-2-2}
+Compiling the source files into executable class files will become tedious.
+We can automate this process using a Makefile:
+
+\begin{verbatim}
+JC = javac
+OUTPUT = executables/
+
+all: nullstate swaptest synchronized_state state unsafe_memory
+
+# All classes for this assingnment
+nullstate : NullState.java
+	$(JC) -d $(OUTPUT) NullState.java
+swaptest : SwapTest.java
+	$(JC) -d $(OUTPUT) SwapTest.java
+synchronized_state : SynchronizedState.java
+	$(JC) -d $(OUTPUT) SynchronizedState.java
+state: State.java
+	$(JC) -d $(OUTPUT) State.java
+unsafe_memory: UnsafeMemory.java
+	$(JC) -d $(OUTPUT) UnsafeMemory.java
+
+clean:
+	rm $(OUTPUT)*
+\end{verbatim}
+\subsection{Testing}
+\label{sec-2-3}
+With the prerequisite files and environment variables all in order, we
+can begin testing and working on the assignment. We'll begin our tests
+on the Synchronized implementation, moving over to the Null model
+afterwards.
+\subsubsection{Synchronized model}
+\label{sec-2-3-1}
+Here we test the synchronized model first. The initial results on my
+local machine indicate that this program is not benefiting from more
+threads. In fact, the more cores we add, the worse our program
+performs. Given, these results, I will move over to the SEASNET
+servers to test application peformance on a multicore machine.
+
+\begin{verbatim}
+Threads average 69.9444 ns/transition
+Threads average 513.126 ns/transition
+Threads average 1511.14 ns/transition
+Threads average 3254.82 ns/transition
+Threads average 6098.57 ns/transition
+Threads average 12087.3 ns/transition
+\end{verbatim}
+
+Below are the tests and results from running the same
+application on the SEASNET servers. The results from
+the SEASNET servers run approximately twice as fast
+as the results my local machine produced. 
+
+\begin{verbatim}
+Synchronized tests
+first test set
+01: Threads average 70.2679 ns/transition
+02: Threads average 425.178 ns/transition
+04: Threads average 1637.13 ns/transition
+08: Threads average 2989.45 ns/transition
+16: Threads average 5828.51 ns/transition
+32: Threads average 14677.7 ns/transition
+\end{verbatim}
+
+\begin{verbatim}
+second test set
+01: Threads average 108.989 ns/transition
+02: Threads average 740.129 ns/transition
+04: Threads average 2763.78 ns/transition
+08: Threads average 4828.20 ns/transition
+16: Threads average 7848.66 ns/transition
+32: Threads average 21089.5 ns/transition
+\end{verbatim}
+
+\begin{verbatim}
+thirds test set
+01: Threads average 90.7319 ns/transition
+02: Threads average 530.770 ns/transition
+04: Threads average 2188.73 ns/transition
+08: Threads average 4002.67 ns/transition
+16: Threads average 8794.03 ns/transition
+32: Threads average 18009.1 ns/transition
+\end{verbatim}
+
+
+\subsubsection{Null model}
+\label{sec-2-3-2}
+As indicated by the specification for this assignment, the
+Null model does not yet work but still passes the test,
+thus it runs to completion much faster than the synchronized
+model. We should note the overhead of creating threads
+at least on this local machine adds considerable running
+time to our program despite the fact that no actual work
+is being done.
+
+\begin{verbatim}
+01 Threads average 36.7658 ns/transition
+02 Threads average 132.399 ns/transition
+04 Threads average 455.818 ns/transition
+08 Threads average 2336.21 ns/transition
+16 Threads average 4654.78 ns/transition
+32 Threads average 8696.07 ns/transition
+\end{verbatim}
+
+\begin{verbatim}
+cd files/executables;
+echo "second test set";
+echo -n "01: "; java UnsafeMemory Null 1 1000000 2 1 1 0 0 1
+echo -n "02: "; java UnsafeMemory Null 2 1000000 2 1 1 0 0 1
+echo -n "04: "; java UnsafeMemory Null 4 1000000 2 1 1 0 0 1
+echo -n "08: "; java UnsafeMemory Null 8 1000000 2 1 1 0 0 1
+echo -n "16: "; java UnsafeMemory Null 16 1000000 2 1 1 0 0 1
+echo -n "32: "; java UnsafeMemory Null 32 1000000 2 1 1 0 0 1
+\end{verbatim}
+
+
+\begin{verbatim}
+thirds test set
+01: Threads average 36.5781 ns/transition
+02: Threads average 138.304 ns/transition
+04: Threads average 439.491 ns/transition
+08: Threads average 2372.14 ns/transition
+16: Threads average 4792.37 ns/transition
+32: Threads average 8229.13 ns/transition
+\end{verbatim}
+
+\section{Unsynchronized implementation}
+\label{sec-3}
+We can begin implementing the unsynchronized model by bringing over
+the code from the synchronized model and tinkering with it. We will
+start with a basic class definition, naming the class
+UnsynchronizedState and letting the Java compiler know that we'll be
+implementing the class State. This means we'll have to take all the
+method signatures from State and actually implement them here:
+
+\begin{verbatim}
+class UnsynchronizedState implements State {
+    private byte[] value;
+    private byte maxval;
+\end{verbatim}
+
+Similar to the synchronized version, we'll have two constructors: a
+constructor that receives an array to initialize to some value, and
+sets the maximum value for the object to 127. We also have a second
+constructor that similarly takes in an array but also takes in a
+byte, setting the maximum value for this object to m.
+
+\begin{verbatim}
+UnsynchronizedState(byte[] v) { value = v; maxval = 127; }
+
+UnsynchronizedState(byte[] v, byte m) { value = v; maxval = m; }
+\end{verbatim}
+
+The key change to the class is simply a removal of the keyword
+\verb~synchronized~ from the definition of the swap method:
+
+\begin{verbatim}
+    public int size() { return value.length; }
+
+    public byte[] current() { return value; }
+
+    public boolean swap(int i, int j) {
+	if (value[i] <= 0 || value[j] >= maxval) {
+	    return false;
+	}
+	value[i]--;
+	value[j]++;
+	return true;
+    }
+}
+\end{verbatim}
+
+We can compile our class and test it like the other two we've
+tested before:
+
+\begin{verbatim}
+cd files;
+make unsynchronized_state
+\end{verbatim}
+
+Finally, before we can run our program again, we need to ensure that
+our program knows how to use the new class by adding two lines of code:
+\begin{verbatim}
+else if (args[0].equals("Unsynchronized"))
+    s = new UnsynchronizedState(stateArg, maxval);
+\end{verbatim}
+
+\subsection{Running Unsynchronized}
+\label{sec-3-1}
+There is a problem with the way that unsynchronized works. When we
+increase the number of threads or swaps beyond an arbitrary value
+the likelihood that the program will become deadlocked increases.
+Thus, for these tests we used orders of magnitude smaller swaps
+than previous tests:
+
+01 Threads average 3412.14 ns/transition
+02 Threads average 6278.02 ns/transition
+sum mismatch (17 != 12)
+04 Threads average 13747.9 ns/transition
+sum mismatch (17 != 18)
+08 Threads average 26983.3 ns/transition
+sum mismatch (17 != 19)
+16 Threads average 56221.0 ns/transition
+sum mismatch (17 != 16)
+32 Threads average 152139 ns/transition
+sum mismatch (17 != 16)
+
+As expected, our unsynchronized class runs into race conditions, where we
+get unexpected unreliable values.
+
+\section{GetNSet}
+\label{sec-4}
+\subsection{Writing the Class}
+\label{sec-4-1}
+With the problematic \emph{unsynchronized} class implemented, we want
+to achieve similar speed but without the race conditions. Is that
+possible? Lets implement Java's atomic integer array and see if
+we can do any better. A definition provided on Wikipedia states
+that an atomic operation is one that is a guarantee of isolation
+from concurrent processes. Since we'll be using the
+AtomicIntegerArray class, lets include it in our file and
+declare a variable \verb~valueIntegerArray~ that we'll instantiate
+in our constructor:
+
+\begin{verbatim}
+import java.util.concurrent.atomic.AtomicIntegerArray;
+
+class GetNSet implements State {
+    private int[] value;
+    private byte maxval;
+    private AtomicIntegerArray valueIntegerArray;
+\end{verbatim}
+
+With the variable declared above, we'd like to instantiate
+an instance of the class; however, looking at the documentation
+for AtomicIntegerArray shows us that we need to pass in an
+integer array, not a byte array. Thus, we'll want to repurpose
+\verb~value~ as an \verb~int~ array and run a loop that will set each
+element its equivalent in the byte array:
+
+\begin{verbatim}
+GetNSet(byte[] v) {
+    value = new int[v.length];
+
+    for(int i = 0; i < value.length; i++){
+	value[i] = v[i];
+    }
+
+    maxval = 127;
+    valueIntegerArray = new AtomicIntegerArray(value);
+}
+
+GetNSet(byte[] v, byte m) { 
+    value = new int[v.length];
+
+    for(int i = 0; i < value.length; i++){
+	value[i] = v[i];
+    }
+
+    maxval = m;
+    valueIntegerArray = new AtomicIntegerArray(value);
+}
+\end{verbatim}
+
+With the constructors that correctly instantiate our AtomIntegerArray
+we can change the size method so that it gets the AtomicIntegerArray
+length. We just call its \verb~length~ method. The \verb~current~ method requires
+us to return a \verb~byte~ array, so we'll need to create a temporary
+byte array and return it:
+
+\begin{verbatim}
+public int size() { return valueIntegerArray.length(); }
+
+public byte[] current() {
+    byte[] tmp = new byte[value.length];
+
+    for(int i = 0; i < tmp.length; i++){
+	tmp[i] = (byte) value[i];
+    }
+
+    return tmp;
+}
+\end{verbatim}
+
+Finally, the \verb~swap~ function needs to use the \verb~get~ and \verb~set~ methods
+provided by the AtomicIntegerArray class:
+
+\begin{verbatim}
+    public boolean swap(int i, int j) {
+	if (valueIntegerArray.get(i) <= 0 || valueIntegerArray.get(j) >= maxval) {
+	    return false;
+	}
+	valueIntegerArray.getAndDecrement(i);
+	valueIntegerArray.getAndIncrement(j);
+	return true;
+    }
+}
+\end{verbatim}
+\subsection{Results}
+\label{sec-4-2}
+Let's run this class, the same way we've done before:
+
+\begin{verbatim}
+cd files/executables;
+echo -n "01 "; java UnsafeMemory GetNSet 1 1000000 6 5 6 3 0 3
+echo -n "02 "; java UnsafeMemory GetNSet 2 1000000 6 5 6 3 0 3
+echo -n "04 "; java UnsafeMemory GetNSet 4 1000000 6 5 6 3 0 3
+echo -n "08 "; java UnsafeMemory GetNSet 8 1000000 6 5 6 3 0 3
+echo -n "16 "; java UnsafeMemory GetNSet 16 1000000 6 5 6 3 0 3
+echo -n "32 "; java UnsafeMemory GetNSet 32 1000000 6 5 6 3 0 3
+\end{verbatim}
+
+Like our previous results, we'd expect that the more threads we add
+the faster our program should run; however, it looks like the overhead
+of creating the threads is too costly for this simple swap function.
+On a positive note, we are no longer getting bad results, even testing
+on an array two and three orders of magnitude larger produces no
+bad results:
+
+\begin{center}
+\begin{tabular}{rllrl}
+32 & Threads & average & 3621.75 & ns/transition\\
+32 & Threads & average & 3904.25 & ns/transition\\
+\end{tabular}
+\end{center}
+
+\section{BetterSafe}
+\label{sec-5}
+\subsection{Writing the class}
+\label{sec-5-1}
+We can now move to the BetterSafe model, which will
+achieve better performance than \emph{Synchronized} but
+still maintain 100\% reliability. We will be able to
+do this by implementing a system of locks and unlocks.
+
+We begin with our familiar code from \emph{Synchronized},
+maintaining a majority of the code. Thus, we only
+change the name of the class along with the constructor
+names to reflect this change. Finally, we'll add a
+lock to use when we are performing a swap:
+
+\begin{verbatim}
+import java.util.concurrent.locks.ReentrantLock;
+
+class BetterSafe implements State {
+    private byte[] value;
+    private byte maxval;
+    private final ReentrantLock swapLock;
+
+    BetterSafe(byte[] v) {
+	value = v; maxval = 127;
+	swapLock = new ReentrantLock();
+    }
+
+    BetterSafe(byte[] v, byte m) {
+	value = v; maxval = m;
+	swapLock = new ReentrantLock();
+    }
+\end{verbatim}
+
+We'll remove the \verb~synchronized~ keyword from the swap
+function and implement a use of locks to make sure that
+no thread steps on anyone else's toes: 
+
+\begin{verbatim}
+public int size() { return value.length; }
+
+public byte[] current() { return value; }
+
+public boolean swap(int i, int j) {
+    swapLock.lock();
+
+    if (value[i] <= 0 || value[j] >= maxval) {
+	swapLock.unlock();
+
+	return false;
+    }
+    value[i]--;
+    value[j]++;
+
+    swapLock.unlock();
+
+    return true;
+			    }
+}
+\end{verbatim}
+\subsection{Testing BetterSafe}
+\label{sec-5-2}
+Let's test our BetterSafe class by performing the same tests
+that we've done in the past:
+
+\begin{center}
+\begin{tabular}{rllrl}
+orginal & test: &  &  & \\
+1 & Threads & average & 78.0822 & ns/transition\\
+2 & Threads & average & 549.396 & ns/transition\\
+4 & Threads & average & 624.036 & ns/transition\\
+8 & Threads & average & 1160.22 & ns/transition\\
+16 & Threads & average & 2405.32 & ns/transition\\
+32 & Threads & average & 5874.64 & ns/transition\\
+larger & test: &  &  & \\
+1 & Threads & average & 78.6375 & ns/transition\\
+2 & Threads & average & 582.671 & ns/transition\\
+4 & Threads & average & 562.409 & ns/transition\\
+8 & Threads & average & 1207.74 & ns/transition\\
+16 & Threads & average & 2455.95 & ns/transition\\
+32 & Threads & average & 5522.98 & ns/transition\\
+\end{tabular}
+\end{center}
+
+\section{BetterSorry}
+\label{sec-6}
+\subsection{Writing BetterSorry}
+\label{sec-6-1}
+\begin{verbatim}
+import java.util.concurrent.TimeUnit;
+
+class BetterSorry implements State {
+    private volatile byte[] value;
+    private byte maxval;
+    private static volatile boolean inCritical = false;
+\end{verbatim}
+
+Similar to the synchronized version, we'll have two constructors: a
+constructor that receives an array to initialize to some value, and
+sets the maximum value for the object to 127. We also have a second
+constructor that similarly takes in an array but also takes in a
+byte, setting the maximum value for this object to m. We'll use a
+psuedo-lock by creating a boolean that lets us know when we're in
+a critical part of the execution, i.e., when we're writing to our
+array.
+
+\begin{verbatim}
+BetterSorry(byte[] v) { value = v; maxval = 127; }
+
+BetterSorry(byte[] v, byte m) { value = v; maxval = m; }
+\end{verbatim}
+
+To make sure we don't have any deadlocks, we'll check to make
+sure we are not in a critical section, i.e., writing to
+our array. If we are, we'll wait our turn. If not, then the
+thread will write what it needs to the array.
+
+\begin{verbatim}
+    public int size() { return value.length; }
+
+    public byte[] current() { return value; }
+
+    public boolean swap(int i, int j) {
+	int v_i = value[i], v_j = value[j];
+
+	if (v_i <= 0 || v_j >= maxval) {
+	    return false;
+	}
+	while(inCritical) {
+	    try {
+		TimeUnit.NANOSECONDS.sleep(1);
+	    } catch (InterruptedException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	    }
+	}
+
+	inCritical = true;
+
+	value[i]--;
+	value[j]++;
+
+	inCritical = false;
+
+
+	return true;
+    }
+}
+\end{verbatim}
+\subsection{Testing BetterSorry}
+\label{sec-6-2}
+
+\begin{center}
+\begin{tabular}{rllrl}
+01 & Threads & average & 69.8024 & ns/transition\\
+02 & Threads & average & 141.296 & ns/transition\\
+04 & Threads & average & 295.705 & ns/transition\\
+08 & Threads & average & 644.861 & ns/transition\\
+sum mismatch (17 != 18) &  &  &  & \\
+16 & Threads & average & 1722.14 & ns/transition\\
+sum mismatch (17 != 23) &  &  &  & \\
+32 & Threads & average & 4318.05 & ns/transition\\
+sum mismatch (17 != 24) &  &  &  & \\
+\end{tabular}
+\end{center}
+% Emacs 24.5.1 (Org mode 8.2.10)
+\end{document}
