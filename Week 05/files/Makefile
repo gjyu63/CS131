@@ -17,6 +17,8 @@ get_n_set : GetNSet.java unsafe_memory
 	$(JC) -d $(OUTPUT) GetNSet.java
 better_safe : BetterSafe.java unsafe_memory
 	$(JC) -d $(OUTPUT) BetterSafe.java
+better_sorry : BetterSorry.java unsafe_memory
+	$(JC) -d $(OUTPUT) BetterSorry.java
 state: State.java
 	$(JC) -d $(OUTPUT) State.java
 unsafe_memory: UnsafeMemory.java
