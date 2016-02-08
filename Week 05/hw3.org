@@ -615,7 +615,7 @@ that we've done in the past:
   #+END_SRC
 ** Testing BetterSorry
 
-   #+BEGIN_SRC sh :output results
+   #+BEGIN_SRC sh :output results :exports results
      cd files/executables;
      echo -n "01 "; java UnsafeMemory BetterSorry 1 1000000 6 5 6 3 0 3
      echo -n "02 "; java UnsafeMemory BetterSorry 2 1000000 6 5 6 3 0 3
