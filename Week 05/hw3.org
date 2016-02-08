@@ -96,12 +96,12 @@ java UnsafeMemory Synchronized 32 1000000 6 5 6 3 0 3
 #+END_SRC
 
 #+RESULTS:
-| Threads  average | 70.7651  ns/transition |
-| Threads  average | 183.874  ns/transition |
-| Threads  average | 428.767  ns/transition |
-| Threads  average | 843.679  ns/transition |
-| Threads  average | 1842.09  ns/transition |
-| Threads  average | 3631.31  ns/transition |
+: Threads average 69.9444 ns/transition
+: Threads average 513.126 ns/transition
+: Threads average 1511.14 ns/transition
+: Threads average 3254.82 ns/transition
+: Threads average 6098.57 ns/transition
+: Threads average 12087.3 ns/transition
 
 Below are the tests and results from running the same
 application on the SEASNET servers. The results from
@@ -120,14 +120,14 @@ echo -n "32: ";java UnsafeMemory Synchronized 32 1000000 6 5 6 3 0 3
 #+END_SRC
 
 #+RESULTS:
-| Synchronized | tests   |         |         |               |
-|        first | test    | set     |         |               |
-|          01: | Threads | average | 85.2718 | ns/transition |
-|          02: | Threads | average | 192.319 | ns/transition |
-|          04: | Threads | average | 479.501 | ns/transition |
-|          08: | Threads | average | 791.218 | ns/transition |
-|          16: | Threads | average |  1634.2 | ns/transition |
-|          32: | Threads | average | 4202.26 | ns/transition |
+: Synchronized tests
+: first test set
+: 01: Threads average 70.2679 ns/transition
+: 02: Threads average 425.178 ns/transition
+: 04: Threads average 1637.13 ns/transition
+: 08: Threads average 2989.45 ns/transition
+: 16: Threads average 5828.51 ns/transition
+: 32: Threads average 14677.7 ns/transition
 
 #+BEGIN_SRC sh :results output :exports results
 cd files/executables;
@@ -141,13 +141,13 @@ echo -n "32: "; java UnsafeMemory Synchronized 32 1000000 2 1 1 0 0 1
 #+END_SRC
 
 #+RESULTS:
-| second | test    | set     |         |               |
-|    01: | Threads | average | 102.025 | ns/transition |
-|    02: | Threads | average | 229.165 | ns/transition |
-|    04: | Threads | average | 543.071 | ns/transition |
-|    08: | Threads | average | 1278.21 | ns/transition |
-|    16: | Threads | average |  2768.9 | ns/transition |
-|    32: | Threads | average | 4956.99 | ns/transition |
+: second test set
+: 01: Threads average 108.989 ns/transition
+: 02: Threads average 740.129 ns/transition
+: 04: Threads average 2763.78 ns/transition
+: 08: Threads average 4828.20 ns/transition
+: 16: Threads average 7848.66 ns/transition
+: 32: Threads average 21089.5 ns/transition
 
 #+BEGIN_SRC sh :results output :exports results
 cd files/executables;
@@ -161,13 +161,13 @@ echo -n "32: "; java UnsafeMemory Synchronized 32 1000000 8 1 1 1 1 1
 #+END_SRC
 
 #+RESULTS:
-| thirds | test    | set     |         |               |
-|    01: | Threads | average |  86.214 | ns/transition |
-|    02: | Threads | average | 205.809 | ns/transition |
-|    04: | Threads | average | 491.793 | ns/transition |
-|    08: | Threads | average | 1030.86 | ns/transition |
-|    16: | Threads | average | 2238.65 | ns/transition |
-|    32: | Threads | average |  5230.2 | ns/transition |
+: thirds test set
+: 01: Threads average 90.7319 ns/transition
+: 02: Threads average 530.770 ns/transition
+: 04: Threads average 2188.73 ns/transition
+: 08: Threads average 4002.67 ns/transition
+: 16: Threads average 8794.03 ns/transition
+: 32: Threads average 18009.1 ns/transition
 
 
 *** Null model
@@ -190,12 +190,12 @@ echo -n "32 "; java UnsafeMemory Null 32 1000000 6 5 6 3 0 3
 #+END_SRC
 
 #+RESULTS:
-| 1  Threads  | average  42.6443  ns/transition |
-| 2  Threads  | average  97.9121  ns/transition |
-| 4  Threads  | average  256.354  ns/transition |
-| 8  Threads  | average  481.088  ns/transition |
-| 16  Threads | average  1400.48  ns/transition |
-| 32  Threads | average  1701.61  ns/transition |
+: 01 Threads average 36.7658 ns/transition
+: 02 Threads average 132.399 ns/transition
+: 04 Threads average 455.818 ns/transition
+: 08 Threads average 2336.21 ns/transition
+: 16 Threads average 4654.78 ns/transition
+: 32 Threads average 8696.07 ns/transition
 
 #+BEGIN_SRC sh :results output exports: results
 cd files/executables;
@@ -209,13 +209,13 @@ echo -n "32: "; java UnsafeMemory Null 32 1000000 2 1 1 0 0 1
 #+END_SRC
 
 #+RESULTS:
-| second | test    | set     |         |               |
-|    01: | Threads | average | 41.2622 | ns/transition |
-|    02: | Threads | average | 124.858 | ns/transition |
-|    04: | Threads | average | 259.175 | ns/transition |
-|    08: | Threads | average | 610.105 | ns/transition |
-|    16: | Threads | average | 958.078 | ns/transition |
-|    32: | Threads | average |  1673.4 | ns/transition |
+: second test set
+: 01: Threads average 37.4382 ns/transition
+: 02: Threads average 146.793 ns/transition
+: 04: Threads average 450.431 ns/transition
+: 08: Threads average 1956.61 ns/transition
+: 16: Threads average 4485.05 ns/transition
+: 32: Threads average 8447.83 ns/transition
 
 
 #+BEGIN_SRC sh :results output :exports results
@@ -230,13 +230,13 @@ echo -n "32: "; java UnsafeMemory Null 32 1000000 8 1 1 1 1 1
 #+END_SRC
 
 #+RESULTS:
-| thirds | test    | set     |         |               |
-|    01: | Threads | average | 41.2914 | ns/transition |
-|    02: | Threads | average | 118.593 | ns/transition |
-|    04: | Threads | average | 290.362 | ns/transition |
-|    08: | Threads | average | 520.991 | ns/transition |
-|    16: | Threads | average | 1633.16 | ns/transition |
-|    32: | Threads | average | 2000.38 | ns/transition |
+: thirds test set
+: 01: Threads average 36.5781 ns/transition
+: 02: Threads average 138.304 ns/transition
+: 04: Threads average 439.491 ns/transition
+: 08: Threads average 2372.14 ns/transition
+: 16: Threads average 4792.37 ns/transition
+: 32: Threads average 8229.13 ns/transition
 
 * Unsynchronized implementation
   We can begin implementing the unsynchronized model by bringing over
@@ -319,11 +319,17 @@ echo -n "32: "; java UnsafeMemory Null 32 1000000 8 1 1 1 1 1
   #+END_SRC
 
   #+RESULTS:
-   sum mismatch (17 != 21)
+   01 Threads average 3412.14 ns/transition
+   02 Threads average 6278.02 ns/transition
+   sum mismatch (17 != 12)
+   04 Threads average 13747.9 ns/transition
    sum mismatch (17 != 18)
-   sum mismatch (17 != 21)
+   08 Threads average 26983.3 ns/transition
    sum mismatch (17 != 19)
-   sum mismatch (17 != 11)
+   16 Threads average 56221.0 ns/transition
+   sum mismatch (17 != 16)
+   32 Threads average 152139 ns/transition
+   sum mismatch (17 != 16)
 
 As expected, our unsynchronized class runs into race conditions, where we
 get unexpected unreliable values.
@@ -428,12 +434,12 @@ provided by the AtomicIntegerArray class:
    #+END_SRC
 
    #+RESULTS:
-   |  1 | Threads | average | 67.5364 | ns/transition |
-   |  2 | Threads | average |  367.85 | ns/transition |
-   |  4 | Threads | average | 953.757 | ns/transition |
-   |  8 | Threads | average | 2157.33 | ns/transition |
-   | 16 | Threads | average | 4351.21 | ns/transition |
-   | 32 | Threads | average | 10085.5 | ns/transition |   
+   |  1 | Threads | average | 68.3925 | ns/transition |
+   |  2 | Threads | average | 264.975 | ns/transition |
+   |  4 | Threads | average | 752.434 | ns/transition |
+   |  8 | Threads | average | 1603.59 | ns/transition |
+   | 16 | Threads | average | 3138.84 | ns/transition |
+   | 32 | Threads | average | 10880.7 | ns/transition |
 
    Like our previous results, we'd expect that the more threads we add
    the faster our program should run; however, it looks like the overhead
@@ -449,8 +455,8 @@ provided by the AtomicIntegerArray class:
    #+END_SRC
 
    #+RESULTS:
-   | 32 | Threads | average | 6963.54 | ns/transition |
-   | 32 | Threads | average | 3769.83 | ns/transition |
+   | 32 | Threads | average | 3621.75 | ns/transition |
+   | 32 | Threads | average | 3904.25 | ns/transition |
 
 * BetterSafe
 ** Writing the class
@@ -536,19 +542,19 @@ that we've done in the past:
 
 #+RESULTS:
 | orginal | test:   |         |         |               |
-|       1 | Threads | average | 79.9405 | ns/transition |
-|       2 | Threads | average | 1003.66 | ns/transition |
-|       4 | Threads | average | 572.069 | ns/transition |
-|       8 | Threads | average | 1194.61 | ns/transition |
-|      16 | Threads | average | 2515.44 | ns/transition |
-|      32 | Threads | average | 5913.67 | ns/transition |
+|       1 | Threads | average | 78.0822 | ns/transition |
+|       2 | Threads | average | 549.396 | ns/transition |
+|       4 | Threads | average | 624.036 | ns/transition |
+|       8 | Threads | average | 1160.22 | ns/transition |
+|      16 | Threads | average | 2405.32 | ns/transition |
+|      32 | Threads | average | 5874.64 | ns/transition |
 |  larger | test:   |         |         |               |
-|       1 | Threads | average | 80.0281 | ns/transition |
-|       2 | Threads | average | 1067.41 | ns/transition |
-|       4 | Threads | average |  601.73 | ns/transition |
-|       8 | Threads | average | 1198.49 | ns/transition |
-|      16 | Threads | average | 2542.19 | ns/transition |
-|      32 | Threads | average | 5915.93 | ns/transition |
+|       1 | Threads | average | 78.6375 | ns/transition |
+|       2 | Threads | average | 582.671 | ns/transition |
+|       4 | Threads | average | 562.409 | ns/transition |
+|       8 | Threads | average | 1207.74 | ns/transition |
+|      16 | Threads | average | 2455.95 | ns/transition |
+|      32 | Threads | average | 5522.98 | ns/transition |
 
 * BetterSorry
 ** Writing BetterSorry
