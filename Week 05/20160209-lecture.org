@@ -1,0 +1,130 @@
+#+AUTHOR: Ryan Sharif
+#+TITLE: Prolog
+#+LATEX_HEADER: \usepackage{amsthm}
+#+LATEX_HEADER: \usepackage{mathtools}
+#+LATEX_HEADER: \usepackage{tikz}
+
+#+LaTeX_HEADER: \usepackage[T1]{fontenc}
+#+LaTeX_HEADER: \usepackage{mathpazo}
+#+LaTeX_HEADER: \linespread{1.05}
+#+LaTeX_HEADER: \usepackage[scaled]{helvet}
+#+LaTeX_HEADER: \usepackage{courier}
+#+LATEX_HEADER: \usepackage{listings}
+#+LATEX_HEADER: \usetikzlibrary{positioning,calc}
+# #+LaTeX_CLASS_OPTIONS: [letter,twoside,twocolumn]
+#+OPTIONS: toc:nil
+* Logical Programming
+Logical programming builds on the idea of a separation of concerns.
+
+* Logic of sort
+We can implement sort in Prolog:
+
+#+BEGIN_SRC prolog
+  sort(L,S) :- perm(L,S), sorted(S).
+#+END_SRC
+
+Here, we define the predicate for sort using its name and saying that
+we can pass it a list, and ...  The ~:-~ is like an /if/, and ~,~ acts
+like a conjuction.
+
+We can say that the empty list is sorted and any singleton list is
+sorted:
+#+BEGIN_SRC prolog :tangle code/20160209-prolog-source.pl
+sorted([]) :- true.
+sorted([_]) :- true.
+#+END_SRC
+
+We can say that the rest of the list is sorted:
+#+BEGIN_SRC prolog :tangle code/20160209-prolog-source.pl
+sorted([X,Y|L]) :- X=<Y, sorted([Y|L]).
+#+END_SRC
+
+Let's now tackle the logic for ~perm~, permuation:
+#+BEGIN_SRC prolog :tangle code/20160209-prolog-source.pl
+  perm([],[]).
+  perm([X],[X]).
+  perm([X|L0], S) :-
+      perm(L0,AB),
+      append(A,B,AB),
+      append(A,[X|B],S).
+#+END_SRC
+
+Note that the scope of variables begins at the definition of 
+predicate to its concluding period.
+
+** Implementation of ~append~
+#+BEGIN_SRC prolog :tangle code/20160209-prolog-source.pl
+append([],L,L).
+apppend([X|L],M[X|append(L,M,LM)).
+#+END_SRC
+
+** Testing our code
+We ask Prolog a question:
+#+BEGIN_SRC prolog
+  ?- sort([],R).
+  R = [].
+
+  ?- sort()[3,5-1],R].
+  R = [-1,3,5].
+
+  ?- sort(3,R).
+  no.
+#+END_SRC
+
+** Left to Right behavior
+We have to write our programs for an interpreter that will read our code from left
+to right, otherwise, Prolog wouldn't know what to do.
+
+* Programs that loop forever
+#+BEGIN_SRC prolog :tangle code/20160209-prolog-source.pl
+append(A,B,C).
+A = [], B = C.
+A = [_27], C = [_27 | B ].
+A = [_27, _39], C = [_27,_39 | B].
+#+END_SRC
+
+** ~fail~
+Since ~fail~ is always ~false~, we can create an infinite loop:
+
+#+BEGIN_SRC prolog
+append(A,B,C), fail.
+#+END_SRC
+
+We can get the program to work by reversing the way we write our logic:
+
+#+BEGIN_SRC prolog :tangle code/20160209-prolog-source.pl
+fail, append(A,B,C).
+#+END_SRC
+
+* Syntax for Prolog
+
+term is one of: number, atom
+
+If you want to have atoms that have special characters, e.g., /spaces/ use
+apostrophes, e.g., '27 true', 'o''clock' are each a single atom.
+
+A variable must begin with an uppercase letter. The `_' variable is the 
+special variable for throwing stuff away.
+
+Computation success can be bound to a term.
+
+When computation backtracks, corresponding variables become unbound again.
+
+** structure
+~f(T_1,...,T_n)~ is an example of a data structure description. The first
+word of a data structure is always an atom, and the arguments are always
+the rest of the values. The arity of a structure corresponds to the number
+of arguments. These are not functions, they are symbols that represent
+functions.
+
+** Syntactic sugar
+~[]~ = ~'[]'~
+~[X|Y]~ = ~'.'(X,Y)~
+~[3,5,9]~ = ~'.'(3,'.'(5,'.'(9, '[]')))~
+~A+B*C~ = ~'+'(A,'*'(B,C))~
+
+*** 37 times 37
+Prolog would interpret and build 37 * 37 as
+#+BEGIN_SRC prolog
+?- '=' (x, '*'(37,37))
+#+END_SRC
