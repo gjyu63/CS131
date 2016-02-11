@@ -1,0 +1,74 @@
+#+AUTHOR: Ryan Sharif
+#+TITLE: Prolog continued
+#+LATEX_HEADER: \usepackage{amsthm}
+#+LATEX_HEADER: \usepackage{mathtools}
+#+LATEX_HEADER: \usepackage{tikz}
+
+#+LaTeX_HEADER: \usepackage[T1]{fontenc}
+#+LaTeX_HEADER: \usepackage{mathpazo}
+#+LaTeX_HEADER: \linespread{1.05}
+#+LaTeX_HEADER: \usepackage[scaled]{helvet}
+#+LaTeX_HEADER: \usepackage{courier}
+#+LATEX_HEADER: \usepackage{listings}
+#+LATEX_HEADER: \usetikzlibrary{positioning,calc}
+# #+LaTeX_CLASS_OPTIONS: [letter,twoside,twocolumn]
+#+OPTIONS: toc:nil
+
+* Revisting ~append~ and ~sort~
+A naive reverse implmentation can be done this way:
+#+BEGIN_SRC prolog
+  append([],L,L).
+  append([X|L],M,[X|LM]) :-
+      append(L,M,LM).
+  reverse([],[]).
+  reverse([X|L],R) :-
+      reverse(L,_),
+      append(_|,[X],R).
+#+END_SRC
+
+A better implementation, that is non-tail recursive uses an accumulator:
+
+#+BEGIN_SRC prolog
+  rev([],A,A).
+  rev([X|L],A,R) :-
+      rev(L,[X|A],R).
+#+END_SRC
+
+In prolog, we want to measure performance by using /logical inferences/
+/per second/ (LIPS).
+
+* Unification
+Prolog uses the idea of unification to bind variables in the caller
+and in the callee. Unification is a generalization of subroutines.
+Every call in Prolog is done by unification.
+
+** Trouble with unification
+Suppose we have a subgoal"
+#+BEGIN_SRC prolog
+  ?- p(f(A),g(b)).
+  p(X,X) :- 
+#+END_SRC
+
+Since the atoms are distinct, there is no way for our unifier to work.
+
+** Unify with occurs check
+0Unify with occurs check works like ~T = U~ except that it has cycle
+checking.
+
+* Computing course prerequisites
+If we were to ask the registrar for prerequisites, we could get a list
+of prerequisites. We'd like to find the chains of prerequisites. The
+prolog implmentation would grow very rapidly.
+
+Now, we want to see courses that are not a prerequisite for some course.
+Since, prolog doesn't have negation, we can use our own:
+#+BEGIN_SRC prolog
+\+(P) :-  P, !, fail.
+\+(_).
+#+END_SRC
+
+This shows us that `,' is not commutative with `\+' : ~\+(x = 4), x = 3~
+
+* Closed world assumption
+The CWA basically says if we don't specify something as true, then it is
+false. 
