@@ -1,9 +1,8 @@
 #+AUTHOR: Ryan Sharif
-#+TITLE: Prolog continued
+#+TITLE: Prolog Theory continued
 #+LATEX_HEADER: \usepackage{amsthm}
 #+LATEX_HEADER: \usepackage{mathtools}
 #+LATEX_HEADER: \usepackage{tikz}
-
 #+LaTeX_HEADER: \usepackage[T1]{fontenc}
 #+LaTeX_HEADER: \usepackage{mathpazo}
 #+LaTeX_HEADER: \linespread{1.05}
@@ -11,7 +10,35 @@
 #+LaTeX_HEADER: \usepackage{courier}
 #+LATEX_HEADER: \usepackage{listings}
 #+LATEX_HEADER: \usetikzlibrary{positioning,calc}
-# #+LaTeX_CLASS_OPTIONS: [letter,twoside,twocolumn]
+#+LaTeX_CLASS_OPTIONS: [letter,twoside,twocolumn]
 #+OPTIONS: toc:nil
 
+* Brief exploration in Artificial Intelligence
+Last week,  we covered  propositional and  predicate logic.  There are
+ways  that we  can simplify  formulas. For  example, we  could replace
+$\exists x(q(x))$  can be rewritten  as $\neg \forall x  (\neg q(x))$.
+This  way of  rewriting traditional  logic is  called /clausal  form/.
+Your problem  is a set of  clauses, noting that these  clauses are all
+true: $A_1 \wedge A_2 \wedge ... \wedge A_n$.
+
+Horn clauses  give us the restriction  where $n \leq 1$,  i.e., he has
+gotten rid of  the `or' sign (a subset of  first-order logic). We have
+three possibilities, where $n = 1, m \geq 1$, $n = 1, m = 0$, and $n =
+0$.
+
+If we look at the inference  steps in Prolog, in general a computation
+can be  thought of  as saying, we  have a bunch  of Goals:  $G_1, G_2,
+.... G_p$. Prolog looks at our leftmost goal.
+
+** Implementing a Prolog interpreter via a stack
+As  your goals  are added,  you push  subgoals to  the stack.  You pop
+subgoals when  they are  succeeded by  facts. But  there is  more than
+success for  pushing and popping. Success  in a match can  also push a
+choice point. Thus, failure pops the  stack to the newest choice point
+and resumes from there. Success, then, omits newests goals, but cannot
+pop all useful  items, keeping new bindings. Failure does  most of the
+real popping. Since our stack will keep growing on success, the Prolog
+interpreter will garbage collect the stack.
+
+* Storage management
 
