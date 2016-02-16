@@ -92,8 +92,50 @@ the activation records are of _fixed size_.
   }
 #+END_SRC
 
-Since we know from the function above, that y and z can both fit
-in an array that is maximally the size of z, the compiler can
-generate one instruction for allocation and one instruction
-for deallocation. This approach is popular but it too has its
-own downsides.
+Since we know from the function above, that y and z can both fit in an
+array that is  maximally the size of z, the  compiler can generate one
+instruction for allocation and  one instruction for deallocation. This
+approach is popular but it too has its own downsides.
+
+The lifetime of an array is the block that it occurs in, the lifetime,
+rememeber, of ~alloca~  is that of the calling  function. What happens
+when  $n <  0$?   If we  are  lucky,  the program  crashes.  If ~n  ==
+INT_MAX~, then the program crashes. The distance between g's frame and
+f's frame is variable. A dynamically sized array also requires a frame
+pointer, in other words more than just a stack pointer.
+
+Another problem occurs in nested functions. Consider the following code:
+#+BEGIN_SRC c
+  int f (int x) {
+    int g(int y) {
+      return x + y;
+    }
+  }
+#+END_SRC
+
+It's easy to get the value inside g's stack, but there is a problem with
+obtaining the value of x, a value stored in f's stack. We can think of
+the stack as a linked list of activation records. This linked list is
+called the dynamic chain, where the `next' field points to the caller.
+For getting the variables we're looking for, we need to consider the
+/static chain/. The static chain is shorter than the dynamic chain
+and can hop before the dynamic chain. The number of hops in the static
+chain is equal to the number of nesting in the source code.
+
+The way to implement currying in C, is that we need to reclaim an
+activation record only if no one is pointing at it. Here we say
+reclaim for the garbage collector. Thus, Activation Records live
+on the heap. And we know that the heap persists as long as it is
+referenced, whereas the stack exists until a function exits.
+
+*** Register storage
+/Leaf functions/ are those that don't call any other functions. Leaf
+variables allow us to avoid the stack all together. 
+
+*** Persistent storage
+There are variables that persist indefinitely. These variables have
+the same variables when your program stopped last time.
+
+*** Lifetime vs. Scope
+If you are looking at a function, and if it declares a variable and
+you use it. A variable's scope is a subset of its lifetime.
