@@ -41,4 +41,59 @@ real popping. Since our stack will keep growing on success, the Prolog
 interpreter will garbage collect the stack.
 
 * Storage management
+** Lifetime of storage
+Professor Eggert had a problem with the following section of code:
 
+#+BEGIN_SRC c
+  if () {
+   } else if (n <= 8) {
+     Lisp_Object a[8];
+     a = ...;
+     f(a);
+   } else if (n < 1024) {
+    List_Object *b = alloca(n * sizeof(*b));
+   } else (n >= 1024) {
+    List_Object *c = malloc(n * sizeof(*c));
+    ...;
+    free(c);
+   }
+
+#+END_SRC
+
+The lifetime of an ~alloca~ function is that of the calling function.
+The implementation given above had the allocation of arrays as most
+common. Professor Eggert says that the program would dump core on
+occassion. The program would only free the memory created by ~alloca~
+when the function ended. This bug stemmed from the lifetime of storage.
+
+** Possible lifetimes
+
+*** Static 
+The simplest lifetime of a C program is static:
+#+BEGIN_SRC c
+int x;
+#+END_SRC
+The storage lasts for the entirety of the runtime.
+Static allocation means we cannot have useful recursion.
+
+*** Static and Stack dynamic 
+C is an example of a program that allows us to have static
+storage along with a dynamically allocated stack. The size of 
+the activation records are of _fixed size_.
+
+#+BEGIN_SRC c
+  int f(int a, int b) {
+    int v = [];
+    if ( x == 5) {
+      int y[10];
+    } else {
+      int z[5];
+    }
+  }
+#+END_SRC
+
+Since we know from the function above, that y and z can both fit
+in an array that is maximally the size of z, the compiler can
+generate one instruction for allocation and one instruction
+for deallocation. This approach is popular but it too has its
+own downsides.
