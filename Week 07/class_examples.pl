@@ -1,0 +1,2 @@
+dog(fido).
+cat(fuzzy).

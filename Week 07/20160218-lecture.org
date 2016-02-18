@@ -1,0 +1,138 @@
+#+AUTHOR: Ryan Sharif
+#+TITLE: Storage management continued
+#+LaTeX_HEADER: \usepackage{minted}
+#+LaTeX_HEADER: \usemintedstyle{emacs}
+#+LATEX_HEADER: \usepackage{amsthm}
+#+LATEX_HEADER: \usepackage{mathtools}
+#+LATEX_HEADER: \usepackage{tikz}
+#+LaTeX_HEADER: \usepackage[T1]{fontenc}
+#+LaTeX_HEADER: \usepackage{mathpazo}
+#+LaTeX_HEADER: \linespread{1.05}
+#+LaTeX_HEADER: \usepackage[scaled]{helvet}
+#+LaTeX_HEADER: \usepackage{courier}
+#+LATEX_HEADER: \usepackage{listings}
+#+LATEX_HEADER: \usetikzlibrary{positioning,calc}
+#+LaTeX_CLASS_OPTIONS: [letter,twoside,twocolumn]
+#+OPTIONS: toc:nil
+
+Professor Eggert has assigned readings for Scheme, Dybrig 1 - 3.5.
+
+* Arrays
+One of the oldest data types that we have are arrays. Many of the
+other data types we have now are based on the assumption that we
+have arrays.
+
+** Nonzero array indices
+*** Implementation
+We can compute the address of an array element: ~a[i]~ is equivalent
+to ~((char *) a + i sizeof * a)~. We can implement an array that 
+doesn't start at zero by pointing at a section of the array that doesn't
+exist.
+*** Problems with this implementation
+If we want to perform subscript checking, we can do a traditional check using
+an unsigned integer for comparison, and we only need to perform one comparison.
+If, we allow for non-zero array indices, we get bogged down with an additional
+instructions.
+** Array slices
+Array slicing comes up with multiple dimensional arrays. We can have
+a function that takes in a vector:
+
+#+BEGIN_SRC c
+  double sumvec(double *v, int n){ ... }
+  /* calling the function */
+
+  sumvec(a[3], 20);
+#+END_SRC
+
+If we wanted to take a column slice of the matrix, we couldn't do it in
+C. In FORTRAN, we can use /fat-pointers/ for representations of arrays.
+This is more complicated, because it is a descriptor. The descriptor
+contains a lower bound, an upperbound, the column index, and the stride,
+which is the distance between the elements we want.
+** Associative arrays
+Another way to work with data is to use what Python calls
+/dictionaries/.  There, an index is a key rather than an integer. To
+implement this type of indexing, we use the notion of a hash function
+to get the real index in the array. We don't use associative arrays
+using hardware associative memory because, hardware caches are not
+flexible, whereas in software, it's critical that we can assign
+arbitrary sizes to our arrays.
+
+*** DoS issue 
+If Google implemented their search engine using such an associative
+array, we could launch a DoS attack. By searching for values that we
+know are collisions, the algorithm that Google uses to store recent
+will slow down significantly. To defend against this, make sure that
+you use a secret hash function.
+
+*** Strong vs. Weak hash table
+We can use a garbage collector to clean our hash table. A weak hash
+table will do better in the DoS attack since we'll clear out the
+entire table, whereas a strong hash table will not. This concept is
+generizable to arbitrary refrences. We hear about /strong references/
+vs.  /weak references/.
+* Heap
+A heap is unlike a stack. A stack is a last-in-first-out, a queue is
+a first-in-first-out. A heap isn't any of these. We can implement a first
+/fit model/ by walking through the free lists and finding the first
+big-enough chunk in the free list. But the solution is slow, because the
+runts will chew up the first few chunks of memory. An alternative is to
+use /best-fit/, which chooses the memory that wastes the least amount of
+storage. Yet another approach is /roving pointer/, which is similar to
+/first fit/ but the head roves around the list, so that you never have
+all the runts at the beginning of the list. All these models have their
+benefits and take aways. Thus, a common system is to use a speedup trick,
+which uses a special layer above the heap manager.
+
+One such example is that used by /racket/. Consider, the operation ~cons~,
+which would make many ~malloc(16)~ calls, followed by free. We can create
+our own allocator, ~rmalloc~:
+#+BEGIN_SRC c
+  struct cons * pfl = 0;
+
+  rmalloc(size_t s) {
+    if (s == 16 && pfl) {
+      r = pfl;
+      pfl = pfl->next;
+    } else {
+      return malloc(s);
+    }
+  }
+#+END_SRC
+
+This trick, as Professor Eggert explains, is a traditional approach but
+it is wrong. It has problems with scaling. Nowadays, heap managers work
+in different ways. One approach, implemented by Oracle with Java, we can
+setup our objects to be at the front of the heap, with free memory after
+an arbitrary point:
+
+#+BEGIN_SRC c
+p = hp;
+hp += 24;
+if(lp < hp) ?
+return p;
+#+END_SRC
+
+With this approach,  we save CPU instructions. But what  do we do when
+we  run outof  memory?  One  solution is  to  divide  our memory  into
+distinct regions  or /generations/.  By convention, the  collection of
+generations are held in a  /nursery/, where the oldest generations are
+on the left,  and the newest generations are on  the right. Experience
+with OOP has shown that it is  more common for new objects to point to
+older objects; it is  less common for an old object to  point to a new
+object.  We  can  exploit  that   fact.   With  this  approach,  using
+generations, we can garbage collect entire /generations/.
+
+Copying is  another problem  that we can  solve. Since  a conventional
+garbage collector  is a /mark-then-sweep/,  i.e., we find  all objects
+reachable from  a global or  local variable, we  mark it, then  in the
+sweep phase,  we visit all  objects, adding them  to the free  list if
+they are unmarked,  and if they are  marked we clear the  mark for the
+next time. But  with our approach, we want to  use a /copy collector/,
+where we  ask for a  new copy  of the nursery  whenever we run  out of
+memory. Thus, copying also implies updating pointers. When we're done,
+we'll have  a new nursery  and garbage  collect the old  nursery. This
+apprach  offers  us a  better  use  of  cache,  along with  very  fast
+~malloc~. Finally, since a /mark-then-sweep collector/ is proportional
+to the  number of objects in  use, including the garbage,  whereas our
+approach avoids us from having to revisit the garbage.
