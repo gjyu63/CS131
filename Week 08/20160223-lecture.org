@@ -1,5 +1,5 @@
 #+AUTHOR: Ryan Sharif
-#+TITLE: 
+#+TITLE: Heap management continued...
 #+LaTeX_HEADER: \usepackage{minted}
 #+LaTeX_HEADER: \usemintedstyle{emacs}
 #+LATEX_HEADER: \usepackage{amsthm}
@@ -14,3 +14,119 @@
 #+LATEX_HEADER: \usetikzlibrary{positioning,calc}
 #+LaTeX_CLASS_OPTIONS: [letter,twoside,twocolumn]
 #+OPTIONS: toc:nil
+
+* Multithreaded applications and heaps
+Recall that newer memory management approaches use the concept of a
+nursery, in programming languages and platforms like Java. What
+happens when we have a multithreaded program, how do they approach
+such a model? In other words, where are the race conditions? One such
+problematic area is the heap pointer. We can solve this race condition
+using a spinlock on the heap pointer. But there is a problem with this
+solution: the heap pointer turns in to a bottleneck. Is there another
+approach? We can have one nursery per thread. With such an approach, we
+can guarantee that there is no race condition on the heap pointer.
+
+** Finalize
+The Java class interface has a method called ~finalize~. This method is
+called on behalf of an object when the garbage collector has determined
+that the object will be freed. For objects with a ~finalize~ method, we
+use the traditional /mark-then-sweep/ garbage collector, otherwise use
+the other garbage collector.
+
+** Real time garbage collection
+Traditionally, garbage collectors have not run during realtime because
+we don't want to pause our entire program during collection. The point of
+realtime garbage collection is that you need a hard upper bound on work
+for each operation. The way to get around this is to do a little bit of
+work whenever we call ~new()~. In other words, we do incremental
+garbage collection. If you play your cards right, you'll get the right
+amount of trade-offs. 
+
+** Conservative garbage collection 
+GNU Emacs uses conservative garbage collection. We have a lot of calls
+to ~malloc~, ~realloc~, and ~free~ in this programs. To get around the
+constant maintenance of memory management, we can do the following at
+the beginning of the source code:
+
+#+BEGIN_SRC c
+#define free(x) ((x), (void) 0)
+#+END_SRC
+
+This gets rid of the /dangling pointers/ problem, but this solution as
+creates memory leaks. To fix this, we write our own ~malloc~:
+
+#+BEGIN_SRC c
+#define malloc(n) cmalloc(n)
+#+END_SRC
+
+Emacs has its own garbage collector. If a variable in the stack points
+to an object in a safe zone, Emacs marks that variable. In other words
+if a words bit pattern looks like a pointer into the heap, mark it.
+This approach sometimes makes mistakes; some objects are assumed to be
+active, when in fact they are ready to be collected. Thus, this
+approach plays it safe and we call this approach conservative. This
+can lead to memory leaks but we no longer have dangling pointers.
+This approach is incompatible with the ~copying+generations~ approach
+we talked about with Java.
+
+** Python garbage collection
+Python uses the /reference counts/ approach to memory
+management. Associated with every object in the heap is a reference
+count to the number of objects that it points to, i.e., every object
+has a reference counter field. Every assignment in Python actually
+assigns three things. The downside to this approach is that it makes
+simple operations slower. The upside is that we can automatically free
+storage whenever the reference count reaches zero.
+
+*** Automatic reference count problem
+We can run into a problem with this approach if we have two objects
+that point to each other. Suppose then that each object then changes
+who it points to. Python would no longer be able to access these
+objects. The solution to this problem is /don't do it/. Because of
+this problem, Python has both an /automatic reference count/ and 
+/mark-then-sweep/ garbage collector. 
+
+*** Python running on JVM
+There is an implementation of Python that runs on a Java virtual
+machine. To combine the two, Python does not use a reference
+counter garbage collector. We use the JVM's /finalize/ garbage
+collector. 
+
+* Scheme
+
+** Properties of scheme
+Lisp, being invented in the middle part of the 20th Century, is
+a big animal. Scheme was invented to counter this large beast.
+Professor Eggert lists criteria for determing if a language is
+a variant of scheme:
+
+- garbage collector: objects are dynamically allocated but never
+  freed
+- dynamic type checking: types are _latent_ not _manifest_; every
+  object has a type.
+- static scoping: scope is manifest, not latent, like Python, OCaml...
+- call-by-value: arguments are passed by value from the caller to the
+  callee
+- every value is an object; all values are first-class
+- simple syntax; you can write the syntax of an application as an object
+- tail recursion is _required_
+- high-level arithmetic: don't worry about integer overflow.
+
+** Indetifiers of scheme
+We have some unexpected valid identifiers in scheme:
+~a-zA-Z0-9+-?/*<=>:$%&~@~. Identifiers cannot begin with numbers, and
+operators occuring alone are not identifiers: ~+ - ->
+...~. Identifiers are used for keywords, variables, and symbols. A
+symbol is a standard data type, and we can evaluate the symbol by
+placing a quote in front of it. Semicolons are used for comments.
+Lists are just spaced out between a pair of parentheses. The empty
+list is two successive parentheses: ~()~, often called ~nil~.
+
+In C, if you write an ~if~ statement or ~if~ expression, the
+expression just has to be zero or not, i.e., zero is ~false~, anything
+else is ~true~. Scheme has these two line as equivalent: ~(if a b c)~
+= ~(if (not (eq? a #f)) b c)~.
+
+Scheme also has syntax for strings and characters: "this is a string"
+and #\c, respectively. Quote is used for the handle on data within
+code.
