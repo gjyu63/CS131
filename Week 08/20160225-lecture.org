@@ -1,0 +1,79 @@
+#+AUTHOR: Ryan Sharif
+#+TITLE: Scheme continued...
+#+LaTeX_HEADER: \usepackage{minted}
+#+LaTeX_HEADER: \usemintedstyle{emacs}
+#+LATEX_HEADER: \usepackage{amsthm}
+#+LATEX_HEADER: \usepackage{mathtools}
+#+LATEX_HEADER: \usepackage{tikz}
+#+LaTeX_HEADER: \usepackage[T1]{fontenc}
+#+LaTeX_HEADER: \usepackage{mathpazo}
+#+LaTeX_HEADER: \linespread{1.05}
+#+LaTeX_HEADER: \usepackage[scaled]{helvet}
+#+LaTeX_HEADER: \usepackage{courier}
+#+LATEX_HEADER: \usepackage{listings}
+#+LATEX_HEADER: \usetikzlibrary{positioning,calc}
+
+#+OPTIONS: toc:nil
+
+* Equality predicates
+Scheme has several predicates for testing equality:
+- ~(eq? a b) ;pointer comparison O(1)~,
+- ~(eqv? a b) ; non-recurvsive comparison O(n)~,
+- ~(equal? a b) ; possibly recursive comparison~
+- ~(= a b)~
+
+* Continuations
+A /continuation/ is an object  representing the future of the program.
+One way to  think about it, is that  a program is a list  of things to
+do,  which  expands  into  something   larger.  At  any  step  in  the
+computation you  have a list  of things to do.  We can thing  of these
+things to do as activation records. A /continuation/ represents a list
+of things to  do to finish the execution of  a function. Scheme allows
+us to explicitly represent this contination as an object. To implement
+this  feature,  we need  an  instruction  pointer and  an  environment
+pointer. We use /fat/ /pointers for functions, where ~ip~ is the first
+instruction to run, and ~ep~ is the activation record for the definer.
+
+A     function      for     working     with      continuations     is
+~call-with-current-continuation~, or ~call/cc~:  ~(call/cc p)~ creates
+a continuation ~k~  and then invokes ~(p k)~ and  returns whatever ~p~
+returns. To use the continuation we call it: ~(k v)~, which jumps back
+to where the continuation was created, ~call/cc~ and returns ~v~. This
+behavior is like a ~try~. Here is an example:
+
+#+BEGIN_SRC scheme
+  (define (prod ls)
+    (call/cc (lambda (break)
+               (let f ((ls ls))
+                 (cond ((null? ls) 1)
+                       ((zero? (car ls)) (break 0))
+                       (else (* (car ls) (f (cdr ls)))))))))
+#+END_SRC
+
+This definition is not tail recursive. Is there some way to do that?
+
+#+BEGIN_SRC scheme
+  (define (prod ls)
+    (call/cc (lambda (break)
+               (let f ((ls ls) (a 1))
+                 (cond ((null? ls) a)
+                       ((zero? (car ls)) (break 0))
+                       (else (f (* (cdr ls) (* a (car ls))))))))))
+#+END_SRC
+
+** Contintuations to build threads
+We can use continuations to build threads:
+#+BEGIN_SRC scheme
+  (define thlist '())
+  (define (thcreate thunk)
+    (set! thlist (append thlist) (list thunk)))
+  (define (start)
+    (let ((next (car thlist )))
+      (set! thlist (cdr (thlist))
+            (next))))
+  (define (pause)
+    (call/cc
+     (lambda (k)
+       (thcreate (lambda () (k #f)))
+       (start))))
+#+END_SRC
