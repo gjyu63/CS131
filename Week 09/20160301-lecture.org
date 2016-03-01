@@ -1,0 +1,136 @@
+#+AUTHOR: Ryan Sharif
+#+TITLE: 
+#+LaTeX_HEADER: \usepackage{minted}
+#+LaTeX_HEADER: \usemintedstyle{emacs}
+#+LATEX_HEADER: \usepackage{amsthm}
+#+LATEX_HEADER: \usepackage{mathtools}
+#+LATEX_HEADER: \usepackage{tikz}
+#+LaTeX_HEADER: \usepackage[T1]{fontenc}
+#+LaTeX_HEADER: \usepackage{mathpazo}
+#+LaTeX_HEADER: \linespread{1.05}
+#+LaTeX_HEADER: \usepackage[scaled]{helvet}
+#+LaTeX_HEADER: \usepackage{courier}
+#+LATEX_HEADER: \usepackage{listings}
+#+LATEX_HEADER: \usetikzlibrary{positioning,calc}
+#+OPTIONS: toc:nil
+
+* Parameter Passing
+  
+** Correspondence
+  There is the issue of correspondence in parameter passing, i.e.,
+  how do you figure out what variable corresponds to what argument.
+  Scheme allows you to define a function that takes one or more
+  arguments and have /varargs/, i.e., variables that are bound to
+  a tuple, which makes our functions more intelligent. 
+
+  #+BEGIN_SRC scheme
+    (define printf
+      (lambda (format . args)
+        ...
+        (printf "%d = %g\n" 27 93.2)))
+  #+END_SRC
+
+  We can achieve the same behavior in C using ~<stdarg.h>~:
+  #+BEGIN_SRC c
+    #include <stdarg.h>
+
+    int f(char *fmt, ...){
+      va_argp ap;
+      va_start(ap, &fmt);
+      double d = va_next(ap, double);
+    }
+  #+END_SRC
+
+** Conventions
+   How do you pass an argument to a function? That is the central
+   question when dealing with parameter passing conventions. Since, we
+   use them over and over, its important to get these conventions
+   correct. The most common convention is /call-by-value/, that is
+   when calling a function, the callee gets a copy of each argument.
+   This convention is found in /C, C++, OCaml, Java.../. Call-by-value
+   is easy to understand and fast for small things.
+
+   An alternative to /call-by-value/ is /call-by-reference/. The basic
+   idea is that every callee gets the address of every argument and
+   dereferences the address when it needs its value. The advantages of
+   using /call-by-reference/ is that it is really cheap, it is efficient
+   for large objects, and can be convenient for results in languages
+   that only allow you to return one value. But it is slow for small
+   objects and is more complicated. The biggest disadvantage is that 
+   this convention can lead to dangling pointers, i.e., disasters
+   caused by aliasing problems.
+
+   A compromise between /call-by-value/ and /call-by-reference/ may be
+   possible. The /Ada/ programming language allows you to /call-by-result/,
+   you start with junk, the callee computes the value, and copys the
+   result back to the caller. In C, there is a function called ~read~:
+   
+   #+BEGIN_SRC c
+     ssize_t read(int fd, char *bof, size_t bufsize)
+   #+END_SRC
+
+   In Ada, you would model this as in C:
+
+   #+BEGIN_SRC ada
+        ssize_t read(int fd, result char buf[bufsize], size_t bufsize)
+   #+END_SRC
+   
+   An advantage of this approach is that you can do better static
+   type checking. Ada has another convention, /call-by-value-result/, which
+   is the union of /call-by-value/ and /call-by-result/, which solves the
+   problems of aliasing. But the downside of this approach is that it is
+   slow for large objects. 
+   
+** Convetions continued
+
+   Prolog's call by unification and Scheme's macro calls don't fit the
+   conventions we've  just discussed. In the  conventions we've talked
+   about, we're  trying to avoid  copying large objects because  it is
+   slow. /Call-by-name/  is to call  by reference as functions  are to
+   pointers. The  callee knows  we are  doing /call-by-name/  and will
+   bundle it up in a pointer.  This is advantages when a function will
+   go into an infinite loop, there /call-by-value/ would fail, whereas
+   /call-by-name/  would  succeed.   A  /call-by-name/  call  succeeds
+   because it is  lazy. Still it is  expensive, so we can  tweak it by
+   caching its value, in what's called /call-by-need/.
+   
+* Exception handling or Error handling
+** Error?
+   What is a good definition for an error? Perhaps, a _bug_ in your
+   program. If you compute $\frac{1}{0}$, there is not good answer.
+   Another type of error, is an erroneous input or unusual event. 
+   Professor Eggert asserts that a large percentage of writing code
+   is spent working on erronous input or unusual events.
+*** Compile time checking
+   We can attempt to fix some errors by using our compiler:
+   #+BEGIN_SRC bash
+   gcc -Wall -Werror -O2
+   #+END_SRC
+   This helps us since it is static type checking, we know errors
+   that the compiler catches here will never occur at runtime.
+   The problem with compile time checkers is that there are too many
+   false alarms and missed errors. An advantage to compile time checks
+   is that it makes your program run faster.
+
+*** Preconditions
+
+    Preconditions can be things like logical expressions, where it is
+    the caller's responsibility and the callee can assume they're
+    true. 
+
+*** Total definition
+
+    What does your program do when it hits an error like this. In C
+    if you have an unsigned arithmetic operation that overflows, it
+    wraps around. 
+
+*** Exceptions
+    
+    We put beautiful code inside the try portions of our code. Stupid
+    user and programming errors go inside the catch portions of your 
+    code. This is known as the separation of concerns. But this approach
+    is analagous to aliasing; it can make simple code look harmless.
+    There is an idea that you can be lulled into a simple way of looking
+    at a difficult problem.
+
+* Object orientation
