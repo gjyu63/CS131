@@ -1,5 +1,5 @@
 #+AUTHOR: Ryan Sharif
-#+TITLE: 
+#+TITLE: Parameters and errors
 #+LaTeX_HEADER: \usepackage{minted}
 #+LaTeX_HEADER: \usemintedstyle{emacs}
 #+LATEX_HEADER: \usepackage{amsthm}
