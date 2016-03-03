@@ -1,0 +1,265 @@
+#+AUTHOR: Ryan Sharif
+#+TITLE: Object oriented languages
+#+LaTeX_HEADER: \usepackage{minted}
+#+LaTeX_HEADER: \usemintedstyle{emacs}
+#+LATEX_HEADER: \usepackage{amsthm}
+#+LATEX_HEADER: \usepackage{mathtools}
+#+LATEX_HEADER: \usepackage{tikz}
+#+LaTeX_HEADER: \usepackage[T1]{fontenc}
+#+LaTeX_HEADER: \usepackage{mathpazo}
+#+LaTeX_HEADER: \linespread{1.05}
+#+LaTeX_HEADER: \usepackage[scaled]{helvet}
+#+LaTeX_HEADER: \usepackage{courier}
+#+LATEX_HEADER: \usepackage{listings}
+#+LATEX_HEADER: \usetikzlibrary{positioning,calc}
+#+OPTIONS: toc:nil
+
+* Object-Oriented Languages
+
+  We have been using Object-oriented languages for years, so Professor
+  Eggert frames  this lecture  in what  can he show  us that  we don't
+  already  know. Webber  makes  the point  between an  object-oriented
+  style and  an object-oriented language.  For example, one  could use
+  Java  in a  non-object-oriented style.  Conversely, you  could write
+  object-oriented style in a language like  C, despite the fact that C
+  is not an object-oriented language.
+
+  Webber  also  makes  the  point  that  what  outsiders  think  about
+  Object-oriented language  is different  from what we  insiders think
+  about  object-oriented language  technologies. Looking  at Java  and
+  Python,  we  see  that  both  are  mostly  object-oriented  but  one
+  implements  dynamic  checking  while  the  other  implements  static
+  checking.
+
+  Still, object-oriented language share many features:
+  - classes: bundle together of fields and methods
+  - instantianable
+  - inheritance unit
+  - types
+  - provide namespaces 
+
+  Nevertheless, we could conceive of languages which are still object-oriented
+  but don't include all these features.
+
+  
+** Prototype-based languages
+
+   Self is a prototype-based language from the 1990's. Self itself was
+   derived from SmallTalk, with a  hope of getting better performance.
+   Java gives us better performance  because of compile time checking.
+   How could  you improve performance  in a dynamic language?   If you
+   give  up  on  the  idea  of having  classes,  you  can  get  better
+   performance.  So, if you get rid of ~new~ and keep ~clone()~. Thus,
+   you start with  prototypes and have fine grain control  of what you
+   clone. Given this state of  affairs, i.e., everything is an object,
+   you implement  duck-typing, like  you do  in Python.  JavaScript is
+   such a language.
+
+** Inheritance issues
+
+  Multiple inheritance increases  the power of your  language but also
+  increases the complexity of the  language. Does every object inherit
+  from  a single  root?  That  question is  orthogonal  to whether  we
+  implement multiple inheritance. Also, can a subclass omit a parent's
+  method?   In prototype-based  languages  you can  delete a  parent's
+  method but this is not possible in an object-oriented language.  One
+  related question is can you override an instance variable? Java lets
+  you but C++ doesn't.
+
+  Let's  look  at  what  you  inherit.   We  usually  accept  that  an
+  object-oriented language  will inherit methods and  slots.  But Java
+  also allows you to inherit an API.  An extension of that is found in
+  Eiffel, which allows you to inherit preconditions, which are logical
+  statements that get checked before a method is called. 
+
+  Finally  there is  the  issue of  encapsulation. Inheritance  breaks
+  encapsulation. When  a child inherits  from a parent, often  has the
+  ability to  look inside the  methods of  its parent class.  Thus, to
+  make it work, you'll have lots of funny rules. These rules attempt to
+  maintain encapsulation while also allowing code to run efficiently. 
+
+* Python
+
+  Suppose we are  given a string like ~line~ below,  which was scraped
+  of the Internet. How can we  efficiently process the data so that we
+  can do some processing.
+
+  #+BEGIN_SRC python
+    line = "GOOG,100,711.96" type = [str,int,float]
+
+    fields = [ty(val) for ty, val in zip(types, line.split(','))]
+  #+END_SRC
+
+  The  code above  will produce  a list  of tuples,  which is  what we
+  wanted:
+
+  #+BEGIN_SRC python
+    ['GOOG', 100, 711.96]
+  #+END_SRC
+
+  Now, we  could do  this in  any other  programming language,  but in
+  Python we  have a  Pythonic philosophy. We  can keep  things without
+  barriers in  a dynamic way.  The motivation for Python  started when
+  FORTRAN was around. FORTRAN was designed for scientific computing in
+  1956. FORTRAN is efficient, hard to use and hard to teach. In reaction
+  to FORTRAN  some professors  came up with  a simpler  saner FORTRAN,
+  which they called  BASIC. BASIC was done in  a different programming
+  environment.   With  BASIC,  you   had  an  interactive  development
+  environment. This approach was better for students.
+
+  A research project in Amsterdam dealt with the problem of bad habits
+  in using BASIC. They came up  with a substitue for BASIC, which they
+  called ABC, which ran on an IBM/PC and had an integrated development
+  environment. It was designed to teach people how to program.  There,
+  standard algorithms were built in  to the language. They also wanted
+  the IDE to do indentation automatically  and refuse to compile if it
+  wasn't done  correctly. The  project failed because  people couldn't
+  get jobs only knowing ABC.
+
+  Perl is a language that combines features from many other languages:
+  C, sh, awk, syscalls, i.e., a kitchen sink approach. Its moto was
+  /there is more than one way to it/. For example these two statements
+  are equivalent:
+
+  #+BEGIN_SRC perl
+    if (a == b) a == c;
+    a = c if (a == b);
+  #+END_SRC
+
+  The designer of ABC looked at Perl and like what he saw. But what he
+  didn't like was the idea of /more than one way to do it/. He took
+  this approach and derived Python. This philosophical difference 
+  remains. 
+
+** More on Python
+   Python has the percent symbol to interpolate:
+
+   #+BEGIN_SRC python
+   "abc%def" % 27 == "abc27ef"
+   #+END_SRC
+
+   In Python,  every value is an  object and has an  identity, a type,
+   and a  value. An objects indentity  and type are immutable  but its
+   value can  be changed if  it belongs to  the class of  objects that
+   have  been implemented  to be  mutable.  If you  like a  functional
+   programming  style,  for example,  work  with  tuples and  strings.
+   Values can  be slit into  attributes and methods,  where attributes
+   are like  Java's variables,  and methods  are like  Java's instance
+   methods. 
+
+   There are some standard built-ins in Python that are very useful:
+   #+BEGIN_SRC python
+     # these two statements do not behave the same way
+     a is b # identity of a and b | always cheap
+     a == b # dereference the pointers | expensive
+   #+END_SRC
+
+   You can also ask for a value's type:
+
+   #+BEGIN_SRC python
+     # dynamic checking
+     type(a)
+   #+END_SRC
+
+   In Java, you would have to use an object's ~getClass()~ method:
+
+   #+BEGIN_SRC java
+     // returns a value of type Class with static checking
+     a.getClass()
+   #+END_SRC
+
+   Similarly, Python and Java differ in how to get an object's id:
+
+   #+BEGIN_SRC python
+     # Python ID   
+     id(a)
+   #+END_SRC
+
+   #+BEGIN_SRC java
+     // Java ID
+     a.hashCode()
+   #+END_SRC
+
+   Finally, we look at how each of these differ in checking whether
+   something is an instance of another class:
+
+   #+BEGIN_SRC python
+     # dynamic python approach
+     isinstance(a, c)
+   #+END_SRC
+
+   #+BEGIN_SRC java
+     // static approach
+     a.instanceOf(C)
+   #+END_SRC
+
+** Defining a class in Python
+
+   #+BEGIN_SRC python
+     # a and b are parent classes
+     class c(a,b):
+         def m(self, p, q):
+             ...
+             return
+
+     # change what you call the class /c/
+     d = c
+   #+END_SRC
+
+   Python also allows  us to achieve multiple  inheritance, which uses
+   depth-first search.
+
+   In our  class above, we  have a member: ~__dict__~,  which contains
+   the a dictionary containing the class' name and what they are bound
+   to.
+
+** Classic Python types
+
+   The Python class hierarchy works pretty well:
+   - /None/
+   - Numbers: /Int, float, complex, boolean/
+   - sequences: /String, Unicode, Tuple, List,
+     Buffer/
+   - mappings: /dict/
+   - callables: /BuiltInFunction, Class, Function ,
+     Method, UnboundMethod, Generators/
+   - internal: /File, Code, Frame, Slice, Traceback,
+     Slice, Ellipsis/
+
+** Basic sequence operators
+   #+BEGIN_SRC python
+     # where 0 <= i < len(s), for ordinary subscript
+     # backwards -len(s) <= i < 0
+     s[i] 
+   #+END_SRC
+
+   You can take a slice or subsequence:
+   #+BEGIN_SRC python
+     s[i:j]
+     s[i:]
+     s[:j]
+   #+END_SRC
+
+   
+** Mutable sequence operators
+   #+BEGIN_SRC python
+     # modify a list
+     s[i] = v
+     s[i:j] = s1
+   #+END_SRC
+
+   You can also delete the i^{th} through j^{th} elements:
+
+   #+BEGIN_SRC python
+     del s[i]
+   #+END_SRC
+
+   For lists, we have the append operator:
+
+   #+BEGIN_SRC python
+     # s = [a][b][c]
+     # s = [a][b][c][x]
+     s.append(x) 
+   #+END_SRC
+
+   
