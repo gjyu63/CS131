@@ -2,8 +2,8 @@ from twisted.internet import reactor, protocol
 import sys
 
 class AtServer(protocol.Protocol):
-    def __init__(self, name):
-        self.name = name
+    def __init__(self):
+        self.name = sys.argv[1]
 
 class AtServerFactory(protocol.ServerFactory):
     def buildFactory(self, addr):
@@ -27,7 +27,8 @@ def check_server_name():
 
 def main():
     check_server_name()
-    server_name = sys.argv[1]
+    reactor.listenTCP(44444, AtServerFactory())
+    reactor.run()
     
 # main subroutine call
 if __name__ == "__main__": main()
