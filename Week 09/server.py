@@ -18,7 +18,12 @@ class AtServer( protocol.Protocol ):
                   zip( types, data.split(" ")) ]
         # figure out the command
         if( input[0] == "IAMAT" ):
+            self.dIAMAT = Deferred()
+            self.dIAMAT.addCallback(self.handleIAMAT)
+            self.dIAMAT.callback(input)
+            
             self.transport.write( input[0] )
+
         elif( input[0] == "AT" ):
             self.transport.write( "fix this" )
         else:
@@ -28,7 +33,17 @@ class AtServer( protocol.Protocol ):
         # add the correct callback
 
         # fire the callback
+
+    def handleIAMAT(self, input):
+        t1 = input[3]
+        self.transport.write("You said the time was: %s" % t1)
         
+    def calculate_time_difference(t1, t2):
+        time_diff = str(float(t2) - float(t1))
+        if (float(time_diff) >= 0):
+            time_diff = "+" + time_diff
+
+        return time_diff
         
     def speakName( self, data ):
         self.transport.write(
