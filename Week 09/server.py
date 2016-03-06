@@ -1,7 +1,11 @@
 from twisted.internet import reactor, protocol
+from twisted.web.client import getPage
 from twisted.internet.defer import Deferred
 import sys, re
 from time import time
+
+# Google Places API key
+from myconfig import *
 
 # Byte-compiled regular expression for GPS coordinates
 r = re.compile("([\+|-]\d+\.\d+)([\+|-]\d+\.\d+)")
@@ -111,6 +115,8 @@ class AtServer( protocol.Protocol ):
                 lookup["client-name"],
                 lookup["location"],
                 lookup["sc-time"] ))
+        
+        self.retrievePlacesJSON( client, radius, 5)
                 
     def calculate_time_difference(self, t1, t2):
         time_diff = str(float(t2) - float(t1))
@@ -118,6 +124,29 @@ class AtServer( protocol.Protocol ):
             time_diff = "+" + time_diff
 
         return time_diff
+
+    def retrievePlacesJSON(self, client, radius, n):
+        '''
+        input includes three parameters:
+        client - client server to lookup
+        radius - desired radius to search in km
+        n - number of desired results
+        '''
+        key = google_key
+        lat = self.servers[client]["latitude"]
+        long = self.servers[client]["longitude"]
+        r = radius
+        base_url = "https://maps.googleapis.com/maps/api/place/" \
+                   "nearbysearch/json?"
+        
+        request_url = "%(base_url)location=%(lat),%(long)"\
+                      "&radius=%(r)&key=%(key)" % { 'base_url': base_url,
+                                                    'lat': lat,
+                                                    'long': long,
+                                                    'r': r,
+                                                    'key': key }
+        self.transport.write("request url: %s\n" % request_url)
+        
         
     def speakName( self, data ):
         self.transport.write(
