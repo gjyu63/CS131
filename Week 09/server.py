@@ -135,15 +135,15 @@ class AtServer( protocol.Protocol ):
         key = google_key
         lat = self.servers[client]["latitude"]
         long = self.servers[client]["longitude"]
-        r = radius
+        r_in_kilometers = int( radius ) * 1000
         base_url = "https://maps.googleapis.com/maps/api/place/" \
                    "nearbysearch/json?"
         
-        request_url = "%(base_url)location=%(lat),%(long)"\
-                      "&radius=%(r)&key=%(key)" % { 'base_url': base_url,
+        request_url = "%(base_url)slocation=%(lat)s,%(long)s" \
+                      "&radius=%(r)i&key=%(key)s" % { 'base_url': base_url,
                                                     'lat': lat,
                                                     'long': long,
-                                                    'r': r,
+                                                    'r': r_in_kilometers,
                                                     'key': key }
         self.transport.write("request url: %s\n" % request_url)
         
