@@ -17,3 +17,11 @@
 #+BEGIN_COMMENT
 This is a comment
 #+END_COMMENT
+
+* Maximum Number of Connections
+  A pubically available server framework needs to ensure that a large
+  number of simulataneous connections can be handle efficiently in
+  order to reduce the number of refused connections, i.e., we want to
+  service lots of people and preferrably avoid saying `no' to our
+  customers. Let us examine how well the Twisted framework handles
+  simulatanous connections. 
