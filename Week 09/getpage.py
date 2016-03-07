@@ -11,11 +11,14 @@ def stop(result):
     reactor.stop()
 
 def printPage(result):
-    print "new run: \n\n\n"
+    print "*" * 80
     jdata = json.loads(result)
-    get = jdata["results"]
-    print get
+    results = jdata["results"]
+    jdata["results"] = results[0:1]
+    #print "%s" % json.dumps(jdata, indent=4)
+    print "%s" % json.dumps(jdata, indent=4)
 
+    
 d = getPage(url)
 d.addCallbacks(printPage)
 d.addCallback(stop)
