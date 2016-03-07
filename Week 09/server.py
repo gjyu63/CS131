@@ -28,10 +28,12 @@ friendly_servers = { "Alford"  : [ "Parker", "Welsh" ],
                      "Parker"  : [ "Alford", "Bolden", "Hamilton" ],
                      "Welsh"   : [ "Alford", "Bolden" ] }
 
+# Client dictionary
+servers = {}
+
 class AtServer( protocol.Protocol ):
     def __init__( self ):
         self.name = sys.argv[1]
-        self.servers = {}
 
         # server log file
         log.startLogging(open('./server_logs/%s' % self.name, 'w'))
@@ -103,7 +105,7 @@ class AtServer( protocol.Protocol ):
         latitude = float(m.group(1))
         longitude = float(m.group(2))
 
-        self.servers[client] = {
+        servers[client] = {
             "server-name"     : server_name,
             "time-difference" : time_diff,
             "client-name"     : client,
@@ -171,7 +173,7 @@ class AtServer( protocol.Protocol ):
         radius = input[2]
         upperbound = int(input[3])
         
-        lookup = self.servers[client]
+        lookup = servers[client]
         
         self.transport.write(
             "AT %s %s %s %s %s\n" % (
@@ -199,8 +201,8 @@ class AtServer( protocol.Protocol ):
         '''
         print "client %s radius %s n %s\n" % (client, radius, n)
         key = google_key
-        lat = self.servers[client]["latitude"]
-        long = self.servers[client]["longitude"]
+        lat = servers[client]["latitude"]
+        long = servers[client]["longitude"]
         r_in_kilometers = int( radius ) * 1000
         base_url = "https://maps.googleapis.com/maps/api/place/" \
                    "nearbysearch/json?"
