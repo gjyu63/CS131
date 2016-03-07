@@ -1,8 +1,12 @@
 from twisted.internet import reactor, protocol
 from twisted.web.client import getPage
 from twisted.internet.defer import Deferred
-import sys, re
-from time import time
+from twisted.python import log
+import sys, re, json
+from time import time, asctime
+
+# server address
+server_addr = "localhost"
 
 # Google Places API key
 from myconfig import *
@@ -10,10 +14,31 @@ from myconfig import *
 # Byte-compiled regular expression for GPS coordinates
 r = re.compile("([\+|-]\d+\.\d+)([\+|-]\d+\.\d+)")
 
+# Server names and their ports
+server_names = { "Alford"   : 44444,
+                 "Bolden"   : 44445,
+                 "Hamilton" : 44446,
+                 "Parker"   : 44447,
+                 "Welsh"    : 44448 }
+
+# Server friends, i.e., servers that talk to each other
+friendly_servers = { "Alford"  : [ "Parker", "Welsh" ],
+                     "Bolden"  : [ "Parker", "Welsh" ],
+                     "Hamilton": [ "Parker" ],
+                     "Parker"  : [ "Alford", "Bolden", "Hamilton" ],
+                     "Welsh"   : [ "Alford", "Bolden" ] }
+
 class AtServer( protocol.Protocol ):
     def __init__( self ):
         self.name = sys.argv[1]
         self.servers = {}
+
+        # server log file
+        log.startLogging(open('./server_logs/%s' % self.name, 'w'))
+        
+        log.msg("%(server_name)s started at %(time)s") % {
+            "server_name": self.name,
+            "time": asctime() }
         
     def dataReceived( self, data ):
         d = Deferred()
@@ -22,40 +47,51 @@ class AtServer( protocol.Protocol ):
 
     def handleInput(self, data):
         # process the data received
-        types = [ str, str, str, str ]
+        types = [ str, str, str, str, str, str ]
         input = [ ty(val) for ty, val in
                   zip( types, data.split(" ")) ]
         # figure out the command
-        if( input[0] == "IAMAT" ):
+        command = input[0]
+        
+        if ( command == "IAMAT" ):
             dIAMAT = Deferred()
             dIAMAT.addCallback(self.handleIAMAT)
             dIAMAT.callback(input)
 
-        elif( input[0] == "WHATSAT" ):
+        elif ( command == "WHATSAT" ):
+            dWHATSAT = Deferred()
+            dWHATSAT.addCallback(self.handleWHATSAT)
+            dWHATSAT.addErrback(self.noentry)
+            dWHATSAT.callback(input)
+
+        elif ( command == "AT"):
+            self.handleAT(input)
             dAT = Deferred()
-            dAT.addCallback(self.handleWHATSAT)
+            dAT.addCallback(self.handleAT)
+            dAT.addErrback(self.noentry)
             dAT.callback(input)
-            
-            self.transport.write( "fix this:\n" )
+
         else:
             self.transport.write( "?" )
 
-    def storeServerLocation(self, input, time, time_diff):
+    def storeServerLocation(self,
+                            server_name,
+                            time_diff,
+                            client,
+                            location,
+                            interaction_time):
         '''Store a server's location.
         
         arguments:
-        input[1] = client name
-        input[2] = location
-        input[3] = client time
-        time - server time
-        time_diff - server-client time difference
+        server_name = server that originally handled the request
+        time_diff   = server-client time difference
+        client      = client name
+        location    = location string provided by the client
+        interaction = time of original interaction
 
         stores:
-        server name, time difference, client,
-        location, server-client time
+        all the arguments in a server dictionary
         '''
-        client = input[1]
-        location = input[2]
 
         # parse the GPS location
         m = r.match(location)
@@ -63,60 +99,59 @@ class AtServer( protocol.Protocol ):
         longitude = float(m.group(2))
 
         self.servers[client] = {
-            "server-name"     : self.name,
+            "server-name"     : server_name,
             "time-difference" : time_diff,
             "client-name"     : client,
             "location"        : location,
-            "sc-time"         : time,
+            "sc-time"         : interaction_time,
             "latitude"        : latitude,
             "longitude"       : longitude }
             
     def handleIAMAT(self, input):
+        server_name = self.name
+        client_name = input[1]
+        location    = input[2]
+
         client_time = input[3]
         server_time = time()
         time_diff = self.calculate_time_difference(
             client_time, server_time)
 
-        server_name = self.name
-        client_server = input[1]
-        location = input[2]
-
-        self.storeServerLocation(input, server_time, time_diff)
+        self.storeServerLocation( server_name,
+                                  time_diff,
+                                  client_name,
+                                  location,
+                                  server_time )
         
-        output_str = "AT %s %s %s %s\n" % ( server_name,
+        output_str = "AT %s %s %s %s %s" % ( server_name,
+                                               time_diff,
+                                               client_name,
+                                               location,
+                                               server_time )
+
+        self.transport.write( "%s\n" % output_str )
+        self.propogateAT(output_str)
+
+    def handleAT(self, input):
+        server_name      = input[1]
+        time_diff        = input[2]
+        client_name      = input[3]
+        location         = input[4]
+        interaction_time = input[5]
+
+        self.storeServerLocation( server_name,
+                                  time_diff,
+                                  client_name,
+                                  location,
+                                  interaction_time )
+        
+        output_str = "AT %s %s %s %s %s" % ( server_name,
                                              time_diff,
-                                             client_server,
+                                             client_name,
+                                             location,
                                              time_diff )
-        
-        self.transport.write( "%s" % output_str )
-
-    def handleWHATSAT(self, input):
-        '''input will be a list of values:
-        input[0] = WHATSAT command
-        input[1] = client name
-        input[2] = information upper bound
-        input[3] = radius of the client
-
-        the server should respond with information, if
-        such a client has already been stored:
-
-        AT <server> <time difference> <client> <location>...
-        <time of server-client interaction> <GOOGLE info>
-        '''
-        client = input[1]
-        upperbound = input[2]
-        radius = input[3]
-        lookup = self.servers[client]
-        
-        self.transport.write(
-            "AT %s %s %s %s %s\n" % (
-                lookup["server-name"],
-                lookup["time-difference"],
-                lookup["client-name"],
-                lookup["location"],
-                lookup["sc-time"] ))
-        
-        self.retrievePlacesJSON( client, radius, 5)
+        # fix me, should be logged
+        print "%s\n" % output_str
                 
     def calculate_time_difference(self, t1, t2):
         time_diff = str(float(t2) - float(t1))
@@ -145,23 +180,66 @@ class AtServer( protocol.Protocol ):
                                                     'long': long,
                                                     'r': r_in_kilometers,
                                                     'key': key }
-        self.transport.write("request url: %s\n" % request_url)
+        g = getPage(request_url)
+        g.addCallback(self.writeoutJSON, n)
+        g.addErrback(self.errorRetrievingData)
+
+    def errorRetrievingData(self, failure):
+        self.transport.write("Couldn't retrieve JSON data. :c\n")
+
+    def noentry(self, failure):
+        self.transport.write("no such entry. :c\n")
+
+    def couldNotConnectFriend(self, failure):
+        # fix this, should log error
+        print "Could not connect to my friend: %s" % failure
         
+    def writeoutJSON(self, result, n):
+        print result
+        jdata = json.loads(result)
+        results = jdata["results"]
+        jdata["results"] = results[:n]
+        self.transport.write( "%s\n" % json.dumps(jdata, indent=4))
         
     def speakName( self, data ):
         self.transport.write(
-            "This is %s, hello.\n" % self.name )
+            "This is %s, hello.\n" % data )
+
+    def propogateAT( self, message ):
+        name = self.name
+        for friend in friendly_servers[ name ]:
+            reactor.connectTCP( server_addr,
+                                server_names[friend],
+                                friendClientFactory( message ))
 
 class AtServerFactory( protocol.Factory ):
     def buildProtocol( self, addr ):
         return AtServer()
 
+class friendClient(protocol.Protocol):
+    def __init__(self, message):
+        self.message = message
+        
+    def connectionMade(self):
+        self.transport.write(self.message)
+        self.transport.loseConnection()
+
+class friendClientFactory(protocol.ClientFactory):
+    def __init__( self, message ):
+        self.message = message
+    
+    def buildProtocol( self, addr ):
+        return friendClient( self.message )
+
+    def clientConnectionFailed(self, connector, reason):
+        # fix, should output to a log
+        print "Connection failed. :c\n"
+
+    def clientConnectionLost(self, connector, reason):
+        # fix, should output to a log
+        print "Connection lost. :c\n"
+    
 def check_server_name():
-    server_names = { "Alford"   : 44444,
-                     "Bolden"   : 44445,
-                     "Hamilton" : 44446,
-                     "Parker"   : 44447,
-                     "Welsh"    : 44448 }
     
     if len( sys.argv ) != 2:
         raise ValueError(
