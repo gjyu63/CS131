@@ -16,14 +16,187 @@
 
 #+BEGIN_LaTeX
 \subsection*{Abstract}
-Your Abstract Text Goes Here.  Just a few facts.
-Whet our appetites.
+We exam the Twisted event-driven network programming Python framework.
+Using a simple Google Places API proxy problem, we implement a server
+herd model to determine whether this technology works for such an
+approach. The framework relies on callback functions to allow a single
+process application to handle simultaneous network connections, avoiding
+input-outut blocking typical of such applications. We consider a problem
+with how many simulataneous connections the framework allows, as well as
+examine similar web technologies available to us.
 #+END_LaTeX
 
-* Maximum Number of Connections
-  A pubically available server framework needs to ensure that a large
-  number of simulataneous connections can be handle efficiently in
-  order to reduce the number of refused connections, i.e., we want to
-  service lots of people and preferrably avoid saying `no' to our
-  customers. Let us examine how well the Twisted framework handles
-  simulatanous connections. 
+* The Twisted Framework
+** Framework overview and testing environment
+  The  Twisted  Framework  is   an  event-driven  network  programming
+  framework,    originally    written    by   Glyph    Lefkowitz    in
+  2002\cite{shtull-trauring_[twisted-python]_2012}.  It is  written in
+  Python and  is licensed under the  MIT License; thus we  have here a
+  mature framework.  For this  project, we  are using  Twisted version
+  15.5.0,  and our  analysis  has been  tested on  a  local dual  core
+  machine with a  Intel(R) Core(TM) i3-2120 CPU @ 3.30GHz,  as well as
+  32-core Intel(R) Xeon(R) CPU E5-2640  v2 @ 2.00GHz server running at
+  UCLA. We deployed a total of five servers, which communicated with
+  each other in varying degrees.
+
+* Server Communication
+** A server herd model
+  The central  challenge of this  simple and parallelizable  proxy for
+  the  Google  Places  API  was  to design  a  server  herd.  Such  an
+  implementation means we want our servers, to be able to talk to each
+  other directly, similar to the way we expect friends to talk to each
+  other.  This approach  avoids the  bottleneck inherent  in the  LAMP
+  model, which is used by Wikipedia. Our model is designed for
+  rapidly evolving data. The Twisted event-driven networking framework
+  facilitates this server herd approach. We were able to build a model
+  within the course of a few days. Thus, implementing this model using
+  Twisted works well using the framework as is; the framework provides
+  a sufficient base to achieve the server herd approach.
+
+** Implementation
+*** Propogation
+   We implementd this server herd model using five servers: Alford,
+   Bolden, Hamilton, Parker, and Welsh. Only some servers talked
+   with each other; for example, Hamilton talked with Parker, but
+   Parker talked to Bolden and Welsh. Thus, the propogation of data
+   within this specification flowed in clusters. The Twisted
+   framework allowed for an easy implementation of this model, needing
+   only about five lines of code to accomplish a propogation:
+   #+BEGIN_SRC python
+     def propogateAT( self, message ):
+         name = self.name
+         for f in f_servers[ name ]:
+             reactor.connectTCP( server_addr,
+                                 server_names[f],
+                                 fClientFactory(
+                                     message ))
+             log.msg("propogating AT " \
+                     "information to other" \
+                     "servers")
+        
+   #+END_SRC
+
+   In this code example, we look for the friends of a server in a
+   Python dictionary and propogate a message to each friendly
+   server. Thus, we can maintain a high-level of abstraction, even
+   within the programming environment. 
+*** Handling multiple connections
+    Being an event-driven framework, Twisted allows us to think about
+    our code as a single process, rather than as a multi-threaded
+    program with confusions about when racing conditions may or may
+    not occur. This is accomplished through its model of `protocols'
+    and `transports', which allow us to fork a process for each
+    new connection, avoiding the input-out blocking bottleneck in
+    a typical singlularly processed application. Once again, Twisted
+    allows us to do much, with very little:
+    #+BEGIN_SRC python
+      reactor.listenTCP(server_port,
+                        AtServerFactory())
+      reactor.run()
+    #+END_SRC
+    Truthfully, there is much more going on behind the scenes; however,
+    the core of what we want to happen when a connection is made,
+    occurs with these two lines of code. Whenever a new connection is
+    made, we fork a new process to handle that request. 
+*** Defers
+    To keep an event-driven approach possible, Twisted requires that
+    we use /callback/ and /errback/ functions, in order to keep the
+    single process from blocking. These function calls allow the
+    process to continue working, returning to these function calls
+    when they are ready to give us the data we need. Since, we needed
+    to perform expensive API calls, for example, getting data from
+    another publically available service, we wanted our program to
+    continue processing other data, until we received what we wanted
+    from these /defer/ function calls:
+
+    #+BEGIN_SRC python
+      dIAMAT = Deferred()
+      dIAMAT.addCallback(
+          self.handleIAMAT)
+      dIAMAT.callback(input)
+    #+END_SRC
+    In this code snippet, found in the server herd python source
+    code, we create a Twisted deferred object, and add the 
+    callback function.    
+
+* Testing and language concerns
+** Running our code anywhere 
+   We were able to run this code on two linux servers, a Debian machine
+   and a Redhat machine, without any changes to source code. Thus, from
+   this small sample size, we see that Twisted allows for easy
+   portability from machine to machine.
+
+** Maximum number of connections problem
+   A pubically available server framework needs to ensure that a large
+   number of  simulataneous connections  can be handle  efficiently in
+   order to reduce the number of refused connections, i.e., we want to
+   service lots  of people  and preferrably avoid  saying `no'  to our
+   customers.  But one  of the  biggest problems  we encountered  when
+   running trying  the Twisted  framework was an  unexpected arbitrary
+   limit  to  the number  of  simulataneous  connections on  a  single
+   server. For reasons that we cannot explain, testing more than 1,000
+   connection at the  same time created stack memory  errors, which we
+   could not attribute to any machine. Thus, unless the exact issue of
+   arbitary connections can be worked  out, this remains a substantial
+   obstacle for adopting the framework.
+
+** Language concerns
+   The  Twised framework  is built  on top  of the  Python programming
+   language.   Thus,  it  is  a  framework  that  carries  the  Python
+   interpretted    development    approach,   type-checking,    memory
+   management,  and multithreading  approach. First,  the interpretted
+   language approach offers us the  ability to develop and deploy code
+   quicker than a statically-typed  approach like Java; however, given
+   that these servers  will run in the wild, it  important to see what
+   we  can do  to ensure  that servers  aren't just  crashing when  we
+   aren't  looking.  Twisted's  /errorback/  error  handling  approach
+   allows us to log errors,  while keeping servers alive through these
+   errors. The Python memory management approach remains a concern, as
+   detailed in the section regarding  a maximum number of connections.
+   Thus, unless this arbitrary limit can  be worked out, it remains an
+   obstacle to adopting this framework for our company.
+
+* Comparisons with other technologies
+** Java
+   Perhaps the most widely used technology on the Internet today relies
+   on Java. Thus, it is worth spending some time looking at why we
+   should adapt it for our purposes or consider Twisted further. 
+   Java utilizes the traditional approach in parallel processing; we
+   return to the multi-threaded model. Thus, along with the potential
+   speed advantages provided by such a model, we also carry along the
+   baggage of race-conditions, mutexes, and locks. Nevertheless, 
+   because of its strong library support and well-tested history,
+   it should remain a possibility for consideration.
+
+** NodeJS
+   NodeJS  is another  technology  that is  similar  to approach  that
+   Twisted takes. JavaScript is  an interpretted programming language,
+   much like  Python. And  both programming languages  are dynamically
+   checked,  which means  errors  that  might have  been  caught in  a
+   statically  checked language,  as in  Java, won't  be caught  until
+   runtime. This allows us as programmers to increase production speed
+   but at  a cost  of safety.   Furthermore, we  see a  similar single
+   process event-driven model in NodeJS.
+
+   Thus, the  two framework share  much in implementation  and overall
+   design philosophy.  NodeJS also  has the  foundation of  V8, Google
+   Chrome's Javascript interpreter, which is what mainly allows NodeJS
+   to run  as fast as it  does. Finally, since our  simple proxy model
+   demonstrated a large portion of code  meant to deal with JSON data,
+   the NodeJS  model is  particularly intriguing  since we  can handle
+   code and  data, in a  unified language. Thus, we  recommend further
+   investigation into this paradigm.
+
+ \bibliographystyle{plain}
+ \bibliography{bibliography}
+
+* Conclusion
+  We  were able  to  sucessfully develop  and  deploy an  event-driven
+  network  programming   application  within  the  course   of  a  few
+  days.  This  developmental  timeline  is  possible  because  of  the
+  /batteries-included/ approach that  Twisted provides.  Nevertheless,
+  competing  technologies, like  Java and  NodeJS, offer  alternatives
+  that may be  faster and more interoperable.  Finally, we  ran into a
+  limit  on simultaneous  connections that  the framework  provides, a
+  considerable obstacle in adopting  the framework. Thus, we recommend
+  an investigation into the NodeJS platform.
