@@ -36,9 +36,9 @@ class AtServer( protocol.Protocol ):
         # server log file
         log.startLogging(open('./server_logs/%s' % self.name, 'w'))
         
-        log.msg("%(server_name)s started at %(time)s") % {
+        log.msg("%(server_name)s started at %(asctime)s" % {
             "server_name": self.name,
-            "time": asctime() }
+            "asctime": asctime() })
         
     def dataReceived( self, data ):
         d = Deferred()
@@ -152,7 +152,32 @@ class AtServer( protocol.Protocol ):
                                              time_diff )
         # fix me, should be logged
         print "%s\n" % output_str
-                
+
+    def handleWHATSAT(self, input):
+        '''input will be a list of values:
+        input[0] = WHATSAT command
+        input[1] = client name
+        input[2] = information upper bound
+        input[3] = radius of the client
+        AT <server> <time difference> <client> <location>...
+        <time of server-client interaction> <GOOGLE info>
+        '''
+        client = input[1]
+        radius = input[2]
+        upperbound = int(input[3])
+        
+        lookup = self.servers[client]
+        
+        self.transport.write(
+            "AT %s %s %s %s %s\n" % (
+                lookup["server-name"],
+                lookup["time-difference"],
+                lookup["client-name"],
+                lookup["location"],
+                lookup["sc-time"] ))
+
+        self.retrievePlacesJSON( client, radius, upperbound)
+
     def calculate_time_difference(self, t1, t2):
         time_diff = str(float(t2) - float(t1))
         if (float(time_diff) >= 0):
@@ -167,6 +192,7 @@ class AtServer( protocol.Protocol ):
         radius - desired radius to search in km
         n - number of desired results
         '''
+        print "client %s radius %s n %s\n" % (client, radius, n)
         key = google_key
         lat = self.servers[client]["latitude"]
         long = self.servers[client]["longitude"]
@@ -195,7 +221,6 @@ class AtServer( protocol.Protocol ):
         print "Could not connect to my friend: %s" % failure
         
     def writeoutJSON(self, result, n):
-        print result
         jdata = json.loads(result)
         results = jdata["results"]
         jdata["results"] = results[:n]
