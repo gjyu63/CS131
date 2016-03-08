@@ -7,6 +7,7 @@
 #+LATEX_HEADER: \usepackage{tikz}
 #+LaTeX_HEADER: \usepackage[T1]{fontenc}
 #+LaTeX_HEADER: \usepackage{mathpazo}
+#+LaTeX_HEADER: \usepackage{hyperref}
 #+LaTeX_HEADER: \linespread{1.05}
 #+LaTex_HEADER: \usepackage{usenix,epsfig,endnotes}
 #+LATEX_HEADER: \usepackage{listings}
@@ -187,9 +188,6 @@ examine similar web technologies available to us.
    code and  data, in a  unified language. Thus, we  recommend further
    investigation into this paradigm.
 
- \bibliographystyle{plain}
- \bibliography{bibliography}
-
 * Conclusion
   We  were able  to  sucessfully develop  and  deploy an  event-driven
   network  programming   application  within  the  course   of  a  few
@@ -200,3 +198,6 @@ examine similar web technologies available to us.
   limit  on simultaneous  connections that  the framework  provides, a
   considerable obstacle in adopting  the framework. Thus, we recommend
   an investigation into the NodeJS platform.
+
+ \bibliographystyle{acm}
+ \bibliography{bibliography}
