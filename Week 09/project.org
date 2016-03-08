@@ -8,15 +8,17 @@
 #+LaTeX_HEADER: \usepackage[T1]{fontenc}
 #+LaTeX_HEADER: \usepackage{mathpazo}
 #+LaTeX_HEADER: \linespread{1.05}
-#+LaTeX_HEADER: \usepackage[scaled]{helvet}
-#+LaTeX_HEADER: \usepackage{courier}
+#+LaTex_HEADER: \usepackage{usenix,epsfig,endnotes}
 #+LATEX_HEADER: \usepackage{listings}
 #+LATEX_HEADER: \usetikzlibrary{positioning,calc}
 #+OPTIONS: toc:nil
+#+LaTeX_CLASS_OPTIONS: [letterpaper,twocolumn,10pt]
 
-#+BEGIN_COMMENT
-This is a comment
-#+END_COMMENT
+#+BEGIN_LaTeX
+\subsection*{Abstract}
+Your Abstract Text Goes Here.  Just a few facts.
+Whet our appetites.
+#+END_LaTeX
 
 * Maximum Number of Connections
   A pubically available server framework needs to ensure that a large
