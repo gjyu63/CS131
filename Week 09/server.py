@@ -44,6 +44,7 @@ class AtServer( protocol.Protocol ):
         d = Deferred()
         d.addCallback( self.handleInput )
         d.callback( data )
+        log.msg("received data to process")
 
     def handleInput(self, data):
         # process the data received
@@ -57,12 +58,14 @@ class AtServer( protocol.Protocol ):
             dIAMAT = Deferred()
             dIAMAT.addCallback(self.handleIAMAT)
             dIAMAT.callback(input)
+            log.msg("IAMAT response")
 
         elif ( command == "WHATSAT" ):
             dWHATSAT = Deferred()
             dWHATSAT.addCallback(self.handleWHATSAT)
             dWHATSAT.addErrback(self.noentry)
             dWHATSAT.callback(input)
+            log.msg("WHATSAT response")
 
         elif ( command == "AT"):
             self.handleAT(input)
@@ -70,9 +73,11 @@ class AtServer( protocol.Protocol ):
             dAT.addCallback(self.handleAT)
             dAT.addErrback(self.noentry)
             dAT.callback(input)
+            log.msg("AT response")
 
         else:
             self.transport.write( "?" )
+            log.msg("received invalid command")
 
     def storeServerLocation(self,
                             server_name,
@@ -106,6 +111,8 @@ class AtServer( protocol.Protocol ):
             "sc-time"         : interaction_time,
             "latitude"        : latitude,
             "longitude"       : longitude }
+        log.msg("stored information about %s"
+                % client)
             
     def handleIAMAT(self, input):
         server_name = self.name
@@ -150,8 +157,6 @@ class AtServer( protocol.Protocol ):
                                              client_name,
                                              location,
                                              time_diff )
-        # fix me, should be logged
-        print "%s\n" % output_str
 
     def handleWHATSAT(self, input):
         '''input will be a list of values:
@@ -209,16 +214,19 @@ class AtServer( protocol.Protocol ):
         g = getPage(request_url)
         g.addCallback(self.writeoutJSON, n)
         g.addErrback(self.errorRetrievingData)
+        log.msg("retrived data for the user")
 
     def errorRetrievingData(self, failure):
         self.transport.write("Couldn't retrieve JSON data. :c\n")
+        log.msg("Could not retreive JSON data")
 
     def noentry(self, failure):
         self.transport.write("no such entry. :c\n")
+        log.msg("could not find entry requested")
 
     def couldNotConnectFriend(self, failure):
-        # fix this, should log error
         print "Could not connect to my friend: %s" % failure
+        log.msg("Could not connecto to friend server: %s" % failure)
         
     def writeoutJSON(self, result, n):
         jdata = json.loads(result)
@@ -236,6 +244,7 @@ class AtServer( protocol.Protocol ):
             reactor.connectTCP( server_addr,
                                 server_names[friend],
                                 friendClientFactory( message ))
+        log.msg("propogating AT information to other servers")
 
 class AtServerFactory( protocol.Factory ):
     def buildProtocol( self, addr ):
@@ -248,6 +257,7 @@ class friendClient(protocol.Protocol):
     def connectionMade(self):
         self.transport.write(self.message)
         self.transport.loseConnection()
+        log.msg("sucessfully connected to friend server")
 
 class friendClientFactory(protocol.ClientFactory):
     def __init__( self, message ):
@@ -257,12 +267,11 @@ class friendClientFactory(protocol.ClientFactory):
         return friendClient( self.message )
 
     def clientConnectionFailed(self, connector, reason):
-        # fix, should output to a log
         print "Connection failed. :c\n"
+        log.msg("Could not connect to friend server")
 
     def clientConnectionLost(self, connector, reason):
-        # fix, should output to a log
-        print "Connection lost. :c\n"
+        log.msg("disconnected from friend server")
     
 def check_server_name():
     
