@@ -14,9 +14,10 @@
 #+LATEX_HEADER: \usetikzlibrary{positioning,calc}
 #+OPTIONS: toc:nil
 #+LaTeX_CLASS_OPTIONS: [letterpaper,twocolumn,10pt]
+#+BIBLIOGRAPHY: refs acm
 
 # Linux Containers (LXC)
-
+this and that. 
 # Docker
 
 # Insider-view talk
@@ -26,3 +27,7 @@
 # Python
 
 # Rust
+
+\bibliographystyle{acm}
+\bibliography{bibliography}
+
