@@ -21,30 +21,46 @@
 # Linux Containers (LXC)
 * Containers
 ** Linux containers (LXC)
-   For several decades, the model of running software on a computer
-   consisted of a hardware layer and an operating system layer, which
-   created an environment for running and executing a user's machine
-   code. Although the virtual machine model traces its history to the
-   early 1960s \cite{pugh:1995}, virtualization of a hardware system
+   For several  decades, the model  of running software on  a computer
+   consisted of a hardware layer  and an operating system layer, which
+   created an environment  for running and executing  a user's machine
+   code. Although the virtual machine  model traces its history to the
+   early 1960s  \cite{pugh:1995}, virtualization of a  hardware system
    became popular in the late 1990s through software such as VMware.
    
-   Initially released in 2008 \cite{linuxlxc2016}, Linux containers
-   (LXC) have become a popular approach to virtualization. LXC are an
-   alternative to the virtual machine approaches, which emulate the
-   hardware of a computer system through software, e.g., CPU, memory,
+   Initially  released in  2008 \cite{linuxlxc2016},  Linux containers
+   (LXC) have become a popular  approach to virtualization. LXC are an
+   alternative to  the virtual  machine approaches, which  emulate the
+   hardware of a computer system  through software, e.g., CPU, memory,
    and hard-disks.  LXC, on the other hand, run using a system's Linux
    kernel, which isolates and manages the resources of an application,
-   allowing a container full access to CPU, memory, input-and-output, 
+   allowing a container full  access to CPU, memory, input-and-output,
    etc...
    
-   Put simply, an LXC is the marriage between executing machine
-   code natively and executing machine code on a virtual machine, you
-   get the benefits and isolation of a virtual machine without the
-   overhead memory and CPU costs. Thus, our analysis of containers
+   Put simply, an  LXC is the marriage between  executing machine code
+   natively and executing  machine code on a virtual  machine, you get
+   the  benefits  and  isolation  of a  virtual  machine  without  the
+   overhead memory  and CPU  costs. Thus,  our analysis  of containers
    will proceed with these core ideas.
 
 ** Docker containers
-   
+   According   to  their   documentation  \cite{docker:2016},   Docker
+   containers  ship  a  piece  of  software  with  a  filesystem  with
+   everything needed to  run code, runtimes, system  tools, and system
+   libraries,  i.e., a  useable  virtual machine.  The  project is  an
+   open-source approach to LXC, with the ability to track changes to a
+   system in a way that is analagous to source code management systems
+   for software development, like  /Git/. Thus, when building software
+   using one  of these docker  containers, development can  proceed on
+   any  machine that  has Docker  installed and  when the  software is
+   ready  to  be  deployed,  developers can  send  containers  to  the
+   machines  they will  run on,  and all  dependencies will  come self
+   contained in the Docker container.
+
+   Docker is written in Google's open-source programming language Go,
+   which was developed by  Robert Griesemer, Rob Pike, and Ken Thompson
+   in 2007 \cite{go:2009}. 
+
 # Docker
 
 # Insider-view talk
