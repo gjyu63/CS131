@@ -17,17 +17,37 @@
 #+BIBLIOGRAPHY: refs acm
 
 # Linux Containers (LXC)
-this and that. 
+this and that. \cite{linuxlxc2016}
 # Docker
 
 # Insider-view talk
+  # 5 reasons to choose Go
+    # Static compilation
 
+    # neutrality
+
+    # what Go includes: asynchronous primitives, low-level, extensive
+    # standard library and data types, duck typing
+
+    # full development environment
+
+    # multi architecture builds
+  # Drawbacks to GO
+    # maps arent't thread safe <- ¡very important!
+    # dependencies <- important
+    # testing      <- important
+    # building     <- important
+    # no IDE (who cares)
+    # verbose error handling (who cares)
+    
+  
 # Java
 
 # Python
 
 # Rust
 
-\bibliographystyle{acm}
-\bibliography{bibliography}
+# Conclusion
 
+\bibliographystyle{acm}
+\bibliography{refs}
