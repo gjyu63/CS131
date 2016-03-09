@@ -16,8 +16,35 @@
 #+LaTeX_CLASS_OPTIONS: [letterpaper,twocolumn,10pt]
 #+BIBLIOGRAPHY: refs acm
 
+# Abstract
+
 # Linux Containers (LXC)
-this and that. \cite{linuxlxc2016}
+* Containers
+** Linux containers (LXC)
+   For several decades, the model of running software on a computer
+   consisted of a hardware layer and an operating system layer, which
+   created an environment for running and executing a user's machine
+   code. Although the virtual machine model traces its history to the
+   early 1960s \cite{pugh:1995}, virtualization of a hardware system
+   became popular in the late 1990s through software such as VMware.
+   
+   Initially released in 2008 \cite{linuxlxc2016}, Linux containers
+   (LXC) have become a popular approach to virtualization. LXC are an
+   alternative to the virtual machine approaches, which emulate the
+   hardware of a computer system through software, e.g., CPU, memory,
+   and hard-disks.  LXC, on the other hand, run using a system's Linux
+   kernel, which isolates and manages the resources of an application,
+   allowing a container full access to CPU, memory, input-and-output, 
+   etc...
+   
+   Put simply, an LXC is the marriage between executing machine
+   code natively and executing machine code on a virtual machine, you
+   get the benefits and isolation of a virtual machine without the
+   overhead memory and CPU costs. Thus, our analysis of containers
+   will proceed with these core ideas.
+
+** Docker containers
+   
 # Docker
 
 # Insider-view talk
@@ -32,6 +59,7 @@ this and that. \cite{linuxlxc2016}
     # full development environment
 
     # multi architecture builds
+
   # Drawbacks to GO
     # maps arent't thread safe <- ¡very important!
     # dependencies <- important
@@ -48,6 +76,11 @@ this and that. \cite{linuxlxc2016}
 # Rust
 
 # Conclusion
+
+# Your summary should focus on the technologies' effects on ease of
+# use, flexibility, generality, performance, reliability; thie idea is
+# to explore the most-important technical challenges in doing the
+# proposed rewrite.
 
 \bibliographystyle{acm}
 \bibliography{refs}
