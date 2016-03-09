@@ -1,0 +1,28 @@
+#+AUTHOR: Ryan Sharif
+#+TITLE: Homework 6: Containerization support languages
+#+LaTeX_HEADER: \usepackage{minted}
+#+LaTeX_HEADER: \usemintedstyle{emacs}
+#+LATEX_HEADER: \usepackage{amsthm}
+#+LATEX_HEADER: \usepackage{mathtools}
+#+LATEX_HEADER: \usepackage{tikz}
+#+LaTeX_HEADER: \usepackage[T1]{fontenc}
+#+LaTeX_HEADER: \usepackage{mathpazo}
+#+LaTeX_HEADER: \usepackage{hyperref}
+#+LaTeX_HEADER: \linespread{1.05}
+#+LaTex_HEADER: \usepackage{usenix,epsfig,endnotes}
+#+LATEX_HEADER: \usepackage{listings}
+#+LATEX_HEADER: \usetikzlibrary{positioning,calc}
+#+OPTIONS: toc:nil
+#+LaTeX_CLASS_OPTIONS: [letterpaper,twocolumn,10pt]
+
+# Linux Containers (LXC)
+
+# Docker
+
+# Insider-view talk
+
+# Java
+
+# Python
+
+# Rust
