@@ -1,0 +1,128 @@
+#+AUTHOR: Ryan Sharif
+#+TITLE: A bit more on Python, cost models
+#+LaTeX_HEADER: \usepackage{minted}
+#+LaTeX_HEADER: \usemintedstyle{emacs}
+#+LATEX_HEADER: \usepackage{amsthm}
+#+LATEX_HEADER: \usepackage{mathtools}
+#+LATEX_HEADER: \usepackage{tikz}
+#+LaTeX_HEADER: \usepackage[T1]{fontenc}
+#+LaTeX_HEADER: \usepackage{mathpazo}
+#+LaTeX_HEADER: \linespread{1.05}
+#+LaTeX_HEADER: \usepackage[scaled]{helvet}
+#+LaTeX_HEADER: \usepackage{courier}
+#+LATEX_HEADER: \usepackage{listings}
+#+LATEX_HEADER: \usetikzlibrary{positioning,calc}
+#+OPTIONS: toc:nil
+
+* More on Python
+
+** Lambdas
+Python has lambdas:
+#+BEGIN_SRC python
+  f = lambda x, y: x + y
+
+  # syntanctic sugar for this
+  def f(x, y):
+      return x + y
+
+  g = f
+#+END_SRC
+
+** Modules
+Modules are about namespace control. Typically they're source files.
+You use modules by using an import statement:
+#+BEGIN_SRC python
+  # here mod is a module we want
+  # to use in our source code
+  import mod
+#+END_SRC
+
+The first step Python does with the code above is that it creates
+a namespace. Second, it reads and executes the file that you
+imported, in the newly created namespace. Finally, it creates a
+name `mod' in the namespace of the caller. Thus, when you write
+~mod.f~, you are looking up ~f~ in the new namespace. What is
+different about the Python implementation, compared to OCaml and
+Java, is that it is an executable. Thus, we can decide at runtime
+what we want to import.
+
+** Packages
+Packages allow you to group together modules in a hierarchy. There
+is a way to initialize the import of several modules using a
+~__init__.py~ file.
+
+* Cost models
+** Cost model approach
+When designing or using a programming languages, we want to develop
+and use a cost model. With a cost model, we have a menatal model of
+how language features are implemented, using this mental model when
+writing or reading code. Thus, if you're using any language for
+production code, performance, cost and various other factors need to
+weighed against each other.
+
+** Absolute vs Big O cost
+When considering absolute  costs, we worry about time,  e.g., how many
+seconds does this algorithm take to  complete. The Big O cost seeks to
+show what  happens as we  scale up.  At the core  of these two  is the
+notion of what  are we worried about: real time,  energy, memory (RAM,
+cache, secondary storage), maintenance/development cost, network
+bandwith/throughput, latency,
+
+** Cost of a list of length n
+In Scheme, the cost of growing a list ~(cons x l)~ is the size of ~l~.
+In contrast, the  cost of appending three lists is  different: we look
+at  the way  each list  is defined.  Scheme walks  through each  list,
+except  the last  list, which  Scheme points  at. With  this approach,
+append is non-destructive,  i.e., we can keep list1,  list2, and list3
+around,  while also  getting the  new list  we wanted.  The cost  of a
+length of a list, is $O(n)$ since we walk through the entire list.
+
+** Cost of calls
+When we were discussing how to implement a call in any language,
+we were concered with keeping the cost of calls down. What is
+the cost of a function call in C:
+
+#+BEGIN_SRC c
+x = f(y + 3, z - 1);
+#+END_SRC
+
+We know that  we evaluate the arugments. We copy  the arguments to the
+agreed-on   parameter   locations,    i.e.,   the   argument   passing
+conventions. On  an x86 machine  we would  push these onto  the stack,
+whereas on  the x86_64  machine, these arguments  would reside  in the
+registers. Next, we need to jump to the procedure start. Next, we push
+the return  address, which we can  think of as just  another argument.
+Then we allocate  a frame, and save registers as  needed. Finally, you
+perform the work of the function. After the work is completed, we copy
+the  resuts to  the return  location. Then  we restore  the registers,
+deallocate the frame and end by jumping back. We can avoid many of 
+these overhead costs by using /tail call optimizations/. 
+
+** Escape analysis
+When looking  at our code,  we may discover  that we create  an object
+that does not  /escape/. In other words, the object  didn't need to be
+allocated  on  the heap,  it  could've  been  allocated on  the  stack
+instead. Stack allocation is preferred because it is cheap compared to
+the  heap. Thus,  when coding,  we should  be aware  of what  pointers
+escape, so we can avoid allocating objects in the heap.
+** Array access costs
+Because multiplications are expensive, we can use powers
+of two for pointer sizes, since we can just use bit shifting.
+There are some cases where using powers of two for array
+sizes can actually make our code run slower:
+#+BEGIN_SRC c
+// L2 cache line size is 64
+double a[30000000][8];
+#+END_SRC
+
+Looking at the array we've declared, we notice that each row array
+is in a cache line. This is an example of a good array size, since
+we can utilize our cache. But suppose we have another declaration:
+#+BEGIN_SRC c
+double b[i][j][k]
+#+END_SRC
+If the only thing that varies in this array is $k$, we'll be fine.
+But if $k$ is constant and $i$ changes, each access is a separate
+line and we're going to have cache thrashing. But if you allocate
+a non-power-two-base number, then we will get fewer collisions in
+our cache. 
