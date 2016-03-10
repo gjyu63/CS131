@@ -1,0 +1,72 @@
+#+AUTHOR: Ryan Sharif
+#+TITLE: Semantics
+#+LaTeX_HEADER: \usepackage{minted}
+#+LaTeX_HEADER: \usemintedstyle{emacs}
+#+LATEX_HEADER: \usepackage{amsthm}
+#+LATEX_HEADER: \usepackage{mathtools}
+#+LATEX_HEADER: \usepackage{tikz}
+#+LaTeX_HEADER: \usepackage[T1]{fontenc}
+#+LaTeX_HEADER: \usepackage{mathpazo}
+#+LaTeX_HEADER: \linespread{1.05}
+#+LaTeX_HEADER: \usepackage[scaled]{helvet}
+#+LaTeX_HEADER: \usepackage{courier}
+#+LATEX_HEADER: \usepackage{listings}
+#+LATEX_HEADER: \usetikzlibrary{positioning,calc}
+#+LATEX_HEADER: \usepackage{ mathrsfs }
+#+OPTIONS: toc:nil
+
+* Syntax vs. Semantics
+
+  We've looked at  syntax, which in a large part  is a solved problem,
+  and scratched the surface of semantics, which is much harder.
+
+** Static semantics
+   
+   Understanding a  program before  running it, i.e.,  understanding a
+   program's  source code.   Donald Knuth  tried to  understand static
+   semantics by using  attribute grammars, a sort of  BNF on steroids.
+   He wanted  to find  a way  to understand  static type  checking and
+   scope checking.  We can take  the grammar  we alread have,  i.e., E
+   \rightarrow E_1 + E_2  and add to it: type(E) =  if type(E_1) = int
+   and type(E_2) = int, then int, else double.
+
+   The problem  of scope can  be handled using  synthesized attributes
+   for simple cases. But a more complex approach is known as inherited
+   attributes.  These attributes  can come  from parents  or siblings.
+   There is  an issue  of cycles, though,  in an  attribute dependency
+   graph.
+
+** Dynamic semantics
+   
+   Dynamic  semantics deals  with the  meaning  of a  program when  it
+   actually  runs.   This  is  the   hardest  part  of   semantics  to
+   understand.  When you  try to  explain the  semantics of  a running
+   program, you'll enivitably run into the halting problem.
+
+   There  are   three  major  categories  for   dealing  with  dynamic
+   semantics: (i) operational, (ii)  axiomatic, and (iii) denotational
+   semantics. In operational semantics  approach, we define a language
+   $\mathscr{L}$   and   assume   the   reader   knows   the   language
+   $\mathscr{K}$. We write an interpreter /i/ in language $\mathscr{K}$.
+
+*** Program verification
+
+    There are times  when we want to make sure  that are programs will
+    do what they are supposed  to in critical applications, i.e., your
+    air bags  will go off  when they're supposed  to.  We can  use the
+    axiomatic approach to verfiy a program. We  use a notion \{ P \} S
+    \{ Q \}, where  P is the precondition, S, is  the statement, and Q
+    is the  postcondition. Looking  at a simple  clause: \{  Q[x/E] \}
+    x := E;  \{ Q\}, if we want  to prove that any Q is  true before a
+    statement/assignment, we take  Q, and substitute E,  for each free
+    occurence of $x$.
+    
+*** Denotational semantics
+    
+    Where operational  semantics wants to write  an imperative program
+    that explains  what is going  on, and axiomatic semantics  want to
+    explain a program by proving a program through logic, denotational
+    programs are  like functional  programs. A  denotational semantics
+    program  explains  a  program.  A standard  idea  of  denotational
+    semantics  is that  the meaning  of a  program $\mathscr{P}$  is a
+    function from state to state. 
