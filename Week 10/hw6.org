@@ -62,37 +62,30 @@
    machines  they will  run on,  and all  dependencies will  come self
    contained in the Docker container.
 
+* Go
+** Why choose Go?
    Docker is written in  Google's open-source programming language Go,
    which was developed by Robert Griesemer, Rob Pike, and Ken Thompson
-   in  2007  \cite{go:2009}.  Go  belongs   to  the  ALGOL  family  of
+   in  2007  \cite{go:2009}.   Go  belongs  to  the  ALGOL  family  of
    programming languages \cite{ohearn:1996}, thus its syntax resembles
-   C  in  many  ways   \cite{go-faq:2016}.  It  is  statically  typed,
+   C  in  many  ways  \cite{go-faq:2016}.   It  is  statically  typed,
    compiled,  allows for  multithreaded applications,  and includes  a
-   garbage collector \cite{go-faq:2016}.
+   garbage collector \cite{go-faq:2016}. Jérôme Petazzoni, a developer
+   at Docker Inc., has stated several  reasons for choosing Go for the
+   development  of  Docker:  (i)  static  compilation,  (ii)  language
+   neutrality, (iii) language  features, (iv) development environment,
+   and (v)  cross architecture compatability \cite{slideshare:2013}.
 
-# Docker
-
-# Insider-view talk
-  # 5 reasons to choose Go
-    # Static compilation
-
-    # neutrality
-
-    # what Go includes: asynchronous primitives, low-level, extensive
-    # standard library and data types, duck typing
-
-    # full development environment
-
-    # multi architecture builds
-
-  # Drawbacks to GO
-    # maps arent't thread safe <- ¡very important!
-    # dependencies <- important
-    # testing      <- important
-    # building     <- important
-    # no IDE (who cares)
-    # verbose error handling (who cares)
-    
+   Petazzoni  also   provides  several  drawback  to   using  Go:  (i)
+   thread-safety,   (ii)   revision   issues,   (iii)   multiple-build
+   difficulties, (iv)  lack of an integrated  development environment,
+   and (v)  error-handling verbosity. We will  ignore (ii) Petazonni's
+   recommendation  for  Go,  based  on  language  neutrality,  largely
+   because we  want to examine other  options, but also because  we do
+   not view language neutrality as  an expensive cost when considering
+   which language is best suited for a project. Throughout the remainder
+   of this paper, we will consider how Java, Python, and Rust align
+   with the features, which Petazonni highlights.    
   
 # Java
 
