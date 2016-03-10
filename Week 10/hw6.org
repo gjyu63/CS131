@@ -46,6 +46,9 @@
    these core ideas.
 
 ** Docker containers
+   # fix, this should include information about the recent switch
+   # from LXC to runc
+   # http://stackoverflow.com/questions/16047306/how-is-docker-different-from-a-normal-virtual-machine
    According   to  their   documentation  \cite{docker:2016},   Docker
    containers  ship  a  piece  of  software  with  a  filesystem  with
    everything needed to  run code, runtimes, system  tools, and system
