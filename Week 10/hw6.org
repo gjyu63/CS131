@@ -135,28 +135,57 @@
      # integrated development environment
 
      # error-handling verbositty
-
+   
 * Python   
-# Python
-   # Benefits compared with go
-     # Static compilation
+** Benefits comparison with Go
 
-     # Language features
+   Python is  perhaps the most  different programming language  of the
+   three  we consider  in  this paper.  Python is  a  very high  level
+   dynamic interpreted language  \cite{python:2016}. Because Python is
+   a  dynamically typed  language, we  no longer  have the  problem of
+   compiling. We can write source code and immediately run our DockAlt
+   program. Of course, this convenience  does not come without a cost;
+   we lose  our statically compiled  safety checks before  our program
+   runs.
 
-     # Development environment
-     # cross architecture compatability
+   As  far  as language  features  are  concerned, Python  offers  the
+   greatest number  of programming paradigms of  the three alternative
+   languages   we   are   considering;  it   offers   object-oriented,
+   imperative,  functional, and  procedural programming  styles. Like,
+   Java and Go, it incorporates  automatic memory management through a
+   garbage collector.   Thus, when we  directly compare Python  and Go
+   with the features  outlined by Petazzoni, we seem to  have a better
+   candidate with  Python. Moreover, it provides  interfaces to system
+   calls and  libraries, which  were important  benefits of  Go, which
+   were       also      touted       as      benefits       of      Go
+   \cite[s.22]{slideshare:2013}. Lastly,  both Go and Python  use duck
+   typing, which allows us to write code more dynamically.
+
+   Similar to the benefits we discussed  with Java, Python offers us a
+   cornucopia of developments environments options. Lastly, because of
+   its popularity and interpreter implementations, Python runs on over
+   twenty  platforms, including  all  the  major platforms,  including
+   Linux.
+
+** Drawbacks comparison with Go
+   One of the biggest drawbacks to Go, as stated by Petazzoni, is the
+   the fact that maps are not thread-safe in Go. In this regard Python
+   appears to be a better option since global dictionaries are thread
+   safe in Python. In fact all builtin types are thread-safe in Python
+   \cite{python_glossary:2016}. We do have an issue with software
+   revision in Python, as the transition from Python 2.x to 3.x remains
+   an ongoing issue in the Python community. Many libraries have
+   begun the transition to 3.x, but not all libraries have completed
+   the transitions.
+
+   Petazzoni's criticism of Go's multiple binary builds is a non-issue
+   for Python, since  the code is not compiled at  all. Similarly, the
+   integrated development environment issue  is non-existent in Python
+   as there  are more  integrated development environments  for Python
+   than  Java. Finally,  Python  approaches error  handling using  the
+   /try-catch/ approach favored by Java.  Thus, it too can be verbose,
+   but is a well understood paradigm.
    
-   # Go drawbacks compared with Java
-     # thread-safety
-   
-     # revision issues
-
-     # multiple-build difficulties
-
-     # integrated development environment
-
-     # error-handling verbositty
-
 * Rust
 # Rust
    # Benefits compared with go
