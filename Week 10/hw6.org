@@ -88,6 +88,31 @@
    with the features, which Petazonni highlights.    
   
 # Java
+* Java
+** Benefits comparison with Go
+   Like Go, Java is statically typed \cite[p.12]{Evans:2014}. But Java
+   shares more with Go; it too  has built in support for multithreaded
+   applications, as  well as  a garbage collector.   Moreover, because
+   Java  has  existed  since   1996  \cite[p.7]{Evans:2014},  a  large
+   repetoire of development environments, including several integrated
+   development  environments,  e.g.,  Eclipse, Netbeans,  as  well  as
+   leight-weight environments like  Microsoft Visual Studio. Petazzoni
+   briefly mentions the  fact that Go can run code  from any C library
+   using /cgo/ to call C functions \cite[s.19]{slideshare:2013}.  Java
+   also     provides    similar     functionality    using     /native
+   methods/\cite[p.69]{Evans:2014},   but   are  implicitly   platform
+   dependent.
+
+   Finally,  because Java  was conceived  with the  aspirations to  be
+   cross  architecture compatible,  and  because of  its Java  virtual
+   machine   technology,  it   is  perhaps   the  most   widely  cross
+   architecture compatible  programming language  we consider  in this
+   paper. Thus,  item for  item, Java  appears to be  as good,  if not
+   better than Go for the features  that the developers of Docker care
+   about.
+
+** Drawbacks comparison with Go
+
 
 # Python
 
