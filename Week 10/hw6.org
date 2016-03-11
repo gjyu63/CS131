@@ -90,6 +90,7 @@
 
 * Java
 ** Benefits comparison with Go
+*** Static typing and development environments
    Like Go, Java is statically typed \cite[p.12]{Evans:2014}. But Java
    shares more with Go; it too  has built in support for multithreaded
    applications, as  well as  a garbage collector.   Moreover, because
@@ -102,7 +103,7 @@
    also     provides    similar     functionality    using     /native
    methods/\cite[p.69]{Evans:2014},   but   are  implicitly   platform
    dependent.
-
+*** Cross-architechture compatability
    Finally,  because Java  was conceived  with the  aspirations to  be
    cross  architecture compatible,  and  because of  its Java  virtual
    machine   technology,  it   is  perhaps   the  most   widely  cross
@@ -112,6 +113,8 @@
    about.
 
 ** Drawbacks comparison with Go
+
+*** Multithreading
    Some  of the  same drawbacks  that Petazzoni  attributes to  Go are
    found in Java.  Although, Java has a well  understood memory model,
    programmers are  still largely responsible for  avoiding unintended
@@ -122,6 +125,7 @@
    performance.  Go's  problem  of  building multiple  binaries  is  a
    non-issue in Java. 
 
+*** Error handling
    We  have  already addressed  the  issue  of integrated  development
    environments in Java; there are a plethora of integrated developent
    environments for Java. Lastly, Java approaches the subject of error
@@ -138,7 +142,7 @@
    
 * Python   
 ** Benefits comparison with Go
-
+*** Dynamic typing
    Python is  perhaps the most  different programming language  of the
    three  we consider  in  this paper.  Python is  a  very high  level
    dynamic interpreted language  \cite{python:2016}. Because Python is
@@ -147,7 +151,7 @@
    program. Of course, this convenience  does not come without a cost;
    we lose  our statically compiled  safety checks before  our program
    runs.
-
+*** Language features
    As  far  as language  features  are  concerned, Python  offers  the
    greatest number  of programming paradigms of  the three alternative
    languages   we   are   considering;  it   offers   object-oriented,
@@ -160,7 +164,7 @@
    were       also      touted       as      benefits       of      Go
    \cite[s.22]{slideshare:2013}. Lastly,  both Go and Python  use duck
    typing, which allows us to write code more dynamically.
-
+*** Cross-architechture compatability
    Similar to the benefits we discussed  with Java, Python offers us a
    cornucopia of developments environments options. Lastly, because of
    its popularity and interpreter implementations, Python runs on over
@@ -187,7 +191,23 @@
    but is a well understood paradigm.
    
 * Rust
-# Rust
+** Static typing and garbage collection
+  Having its first stable release in May 2015, Rust is the youngest
+  language we will consider in this paper \cite{rust_faq:2016}.
+  Petazzoni makes a brief mention of Rust \cite[s.26]{slideshare:2013},
+  in his explanation for why the Docker team chose Go, asserting that
+  Go is ``more real than Rust.'' This situation may have been true in
+  2013, when Petazzoni gave his talk; however, since then Rust has
+  had an official release, as explained above. Both languages share
+  the fact that they are statically typed; however, Rust does not use
+  a garbage collector, guaranteeing memory safety through what Rust
+  developers call ownership and borrowing. Thus, although we would
+  be responsible for memory management, Rust will not allow us to
+  write software that /segfaults/\cite{rust_faq:2016}.
+
+  With Rust being such a young language, it too lacks an integrated
+  development environment. Still, it makes up for this 
+
    # Benefits compared with go
      # Static compilation
 
