@@ -89,7 +89,7 @@
   
 * Java
 # Java
-<<<<<<< HEAD
+
 * Java
 ** Benefits comparison with Go
    Like Go, Java is statically typed \cite[p.12]{Evans:2014}. But Java
@@ -114,16 +114,6 @@
    about.
 
 ** Drawbacks comparison with Go
-
-=======
-   # Benefits compared with go
-     # Static compilation
->>>>>>> origin/HEAD
-
-     # Language features
-
-     # Development environment
-     # cross architecture compatability
    
    # Go drawbacks compared with Java
      # thread-safety
