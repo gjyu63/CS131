@@ -12,6 +12,7 @@
 #+LaTex_HEADER: \usepackage{usenix,epsfig,endnotes}
 #+LATEX_HEADER: \usepackage{listings}
 #+LATEX_HEADER: \usetikzlibrary{positioning,calc}
+#+LATEX_HEADER: \usepackage{url}
 #+OPTIONS: toc:nil
 #+LaTeX_CLASS_OPTIONS: [letterpaper,twocolumn,10pt]
 #+BIBLIOGRAPHY: refs acm
@@ -86,9 +87,6 @@
    which language is best suited for a project. Throughout the remainder
    of this paper, we will consider how Java, Python, and Rust align
    with the features, which Petazonni highlights.    
-  
-* Java
-# Java
 
 * Java
 ** Benefits comparison with Go
@@ -114,9 +112,21 @@
    about.
 
 ** Drawbacks comparison with Go
-   
-   # Go drawbacks compared with Java
-     # thread-safety
+   Some  of the  same drawbacks  that Petazzoni  attributes to  Go are
+   found in Java.  Although, Java has a well  understood memory model,
+   programmers are  still largely responsible for  avoiding unintended
+   variable  read   and  writes   by  mutliple  threads,   i.e.,  race
+   conditions. Still,  Java does provide the  ability to automatically
+   convert  functions into  thread-safe function,  through the  use of
+   ~synchronized~  attribution, though  this may  significantly affect
+   performance.  Go's  problem  of  building multiple  binaries  is  a
+   non-issue in Java. 
+
+   We  have  already addressed  the  issue  of integrated  development
+   environments in Java; there are a plethora of integrated developent
+   environments for Java. Lastly, Java approaches the subject of error
+   handling using  the /try-catch/ paradigm, which  is well-understood
+   but can be similarly verbose.
    
      # revision issues
 
