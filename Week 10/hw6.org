@@ -87,13 +87,71 @@
    of this paper, we will consider how Java, Python, and Rust align
    with the features, which Petazonni highlights.    
   
+* Java
 # Java
+   # Benefits compared with go
+     # Static compilation
 
+     # Language features
+
+     # Development environment
+     # cross architecture compatability
+   
+   # Go drawbacks compared with Java
+     # thread-safety
+   
+     # revision issues
+
+     # multiple-build difficulties
+
+     # integrated development environment
+
+     # error-handling verbositty
+
+* Python   
 # Python
+   # Benefits compared with go
+     # Static compilation
 
+     # Language features
+
+     # Development environment
+     # cross architecture compatability
+   
+   # Go drawbacks compared with Java
+     # thread-safety
+   
+     # revision issues
+
+     # multiple-build difficulties
+
+     # integrated development environment
+
+     # error-handling verbositty
+
+* Rust
 # Rust
+   # Benefits compared with go
+     # Static compilation
+
+     # Language features
+
+     # Development environment
+     # cross architecture compatability
+   
+   # Go drawbacks compared with Java
+     # thread-safety
+   
+     # revision issues
+
+     # multiple-build difficulties
+
+     # integrated development environment
+
+     # error-handling verbositty
 
 # Conclusion
+* Conclusion
 
 # Your summary should focus on the technologies' effects on ease of
 # use, flexibility, generality, performance, reliability; thie idea is
