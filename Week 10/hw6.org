@@ -192,43 +192,57 @@
    
 * Rust
 ** Static typing and garbage collection
-  Having its first stable release in May 2015, Rust is the youngest
-  language we will consider in this paper \cite{rust_faq:2016}.
-  Petazzoni makes a brief mention of Rust \cite[s.26]{slideshare:2013},
-  in his explanation for why the Docker team chose Go, asserting that
-  Go is ``more real than Rust.'' This situation may have been true in
-  2013, when Petazzoni gave his talk; however, since then Rust has
-  had an official release, as explained above. Both languages share
-  the fact that they are statically typed; however, Rust does not use
-  a garbage collector, guaranteeing memory safety through what Rust
-  developers call ownership and borrowing. Thus, although we would
-  be responsible for memory management, Rust will not allow us to
-  write software that /segfaults/\cite{rust_faq:2016}.
+  Having its  first stable release in  May 2015, Rust is  the youngest
+  language  we  will  consider  in  this  paper  \cite{rust_faq:2016}.
+  Petazzoni      makes      a      brief     mention      of      Rust
+  \cite[s.26]{slideshare:2013}, in his explanation  for why the Docker
+  team chose  Go, asserting that Go  is ``more real than  Rust.'' This
+  situation may have been true in  2013, when Petazzoni gave his talk;
+  however, since then  Rust has had an official  release, as explained
+  above.
 
-  With Rust being such a young language, it too lacks an integrated
-  development environment. Still, it makes up for this 
+  Both  languages  share the  fact  that  they are  statically  typed;
+  however, Rust does not use  a garbage collector, guaranteeing memory
+  safety through  what Rust  developers call ownership  and borrowing.
+  Thus, although we  would be responsible for  memory management, Rust
+  will     not     allow     us     to     write     software     that
+  /segfaults/\cite{rust_faq:2016}, i.e., crashes  because of unplanned
+  memory bugs.
 
-   # Benefits compared with go
-     # Static compilation
+  Rust  is  a  young  language;  therefore,  it  lacks  an  integrated
+  development  environment.   It  is  available for  the  three  major
+  operating systems: Windows, OS X, and Linux. Furthermore, the source
+  code  for  building  Rust  is available;  however,  even  some  Unix
+  environments  do  not  currently support  Rust  out-of-the-box.  For
+  example,  Rust  can  only  compile   on  FreeBSD  versions  10.x  and
+  above. Nevertheless, since we want DockAlt to run on a Linux system,
+  the issue is moot.
 
-     # Language features
-
-     # Development environment
-     # cross architecture compatability
+** Go drawbacks compared with Rust   
    
-   # Go drawbacks compared with Java
-     # thread-safety
-   
-     # revision issues
+   Thread safety,  and Rust's approach  to concurrency in  general, is
+   the  biggest reason  to  adopt  Rust over  Go.  According to  their
+   documentation, `` Rust programs must be memory safe, having no data
+   races'' \cite{rust_faq:2016}. Thus,  given that we can  rely on the
+   compiler to enforce  memory safety, we can  develop concurrent code
+   without the  fear of data races.
 
-     # multiple-build difficulties
+   Returning to  Petazzoni's criticism of Go's  revision history, Rust
+   has  had significant  code-base  changes.  Similarly,  it lacks  an
+   integrated  development  environment.   Finally,  documenation  for
+   Rust's error handling suggests that subject is dealt with seriously
+   by Rust, albeit more verbose than Go.
 
-     # integrated development environment
-
-     # error-handling verbositty
-
-# Conclusion
 * Conclusion
+  
+  # Groups of languages
+  
+
+  # What we want
+  
+  # Recommendation
+
+  # What we get in return
 
 # Your summary should focus on the technologies' effects on ease of
 # use, flexibility, generality, performance, reliability; thie idea is
