@@ -19,7 +19,7 @@
 
 # Abstract
 
-# Linux Containers (LXC)
+
 * Containers
 ** Linux containers (LXC)
    For several  decades, the model  of running software on  a computer
@@ -51,11 +51,11 @@
    # from LXC to runc
    # http://stackoverflow.com/questions/16047306/how-is-docker-different-from-a-normal-virtual-machine
    According   to  their   documentation  \cite{docker:2016},   Docker
-   containers  ship  a  piece  of  software  with  a  filesystem  with
+   containers  ship  a  piece  of  software  with  a  file-system  with
    everything needed to  run code, runtimes, system  tools, and system
-   libraries,  i.e., a  useable virtual  machine.  The  project is  an
+   libraries,  i.e., a  usable virtual  machine.  The  project is  an
    open-source approach to LXC, with the ability to track changes to a
-   system in a way that is analagous to source code management systems
+   system in a way that is analogous to source code management systems
    for software development, like  /Git/. Thus, when building software
    using one  of these docker  containers, development can  proceed on
    any  machine that  has Docker  installed and  when the  software is
@@ -70,12 +70,12 @@
    in  2007  \cite{go:2009}.   Go  belongs  to  the  ALGOL  family  of
    programming languages \cite{ohearn:1996}, thus its syntax resembles
    C  in  many  ways  \cite{go-faq:2016}.   It  is  statically  typed,
-   compiled,  allows for  multithreaded applications,  and includes  a
+   compiled,  allows for  multi-threaded applications,  and includes  a
    garbage collector \cite{go-faq:2016}. Jérôme Petazzoni, a developer
    at Docker Inc., has stated several  reasons for choosing Go for the
    development  of  Docker:  (i)  static  compilation,  (ii)  language
    neutrality, (iii) language  features, (iv) development environment,
-   and (v)  cross architecture compatability \cite{slideshare:2013}.
+   and (v)  cross architecture compatibility \cite{slideshare:2013}.
 
    Petazzoni  also   provides  several  drawback  to   using  Go:  (i)
    thread-safety,   (ii)   revision   issues,   (iii)   multiple-build
@@ -92,18 +92,18 @@
 ** Benefits comparison with Go
 *** Static typing and development environments
    Like Go, Java is statically typed \cite[p.12]{Evans:2014}. But Java
-   shares more with Go; it too  has built in support for multithreaded
+   shares more with Go; it too  has built in support for multi-threaded
    applications, as  well as  a garbage collector.   Moreover, because
    Java  has  existed  since   1996  \cite[p.7]{Evans:2014},  a  large
-   repetoire of development environments, including several integrated
+   repertoire of development environments, including several integrated
    development  environments,  e.g.,  Eclipse, Netbeans,  as  well  as
-   leight-weight environments like  Microsoft Visual Studio. Petazzoni
+   light-weight environments like  Microsoft Visual Studio. Petazzoni
    briefly mentions the  fact that Go can run code  from any C library
    using /cgo/ to call C functions \cite[s.19]{slideshare:2013}.  Java
    also     provides    similar     functionality    using     /native
    methods/\cite[p.69]{Evans:2014},   but   are  implicitly   platform
    dependent.
-*** Cross-architechture compatability
+*** Cross-architecture compatibility
    Finally,  because Java  was conceived  with the  aspirations to  be
    cross  architecture compatible,  and  because of  its Java  virtual
    machine   technology,  it   is  perhaps   the  most   widely  cross
@@ -114,11 +114,11 @@
 
 ** Drawbacks comparison with Go
 
-*** Multithreading
+*** Multi-threading
    Some  of the  same drawbacks  that Petazzoni  attributes to  Go are
    found in Java.  Although, Java has a well  understood memory model,
    programmers are  still largely responsible for  avoiding unintended
-   variable  read   and  writes   by  mutliple  threads,   i.e.,  race
+   variable  read   and  writes   by  multiple  threads,   i.e.,  race
    conditions. Still,  Java does provide the  ability to automatically
    convert  functions into  thread-safe function,  through the  use of
    ~synchronized~  attribution, though  this may  significantly affect
@@ -127,7 +127,7 @@
 
 *** Error handling
    We  have  already addressed  the  issue  of integrated  development
-   environments in Java; there are a plethora of integrated developent
+   environments in Java; there are a plethora of integrated development
    environments for Java. Lastly, Java approaches the subject of error
    handling using  the /try-catch/ paradigm, which  is well-understood
    but can be similarly verbose.
@@ -138,7 +138,7 @@
 
      # integrated development environment
 
-     # error-handling verbositty
+     # error-handling verbosity
    
 * Python   
 ** Benefits comparison with Go
@@ -164,7 +164,7 @@
    were       also      touted       as      benefits       of      Go
    \cite[s.22]{slideshare:2013}. Lastly,  both Go and Python  use duck
    typing, which allows us to write code more dynamically.
-*** Cross-architechture compatability
+*** Cross-architecture compatibility
    Similar to the benefits we discussed  with Java, Python offers us a
    cornucopia of developments environments options. Lastly, because of
    its popularity and interpreter implementations, Python runs on over
@@ -214,7 +214,7 @@
   operating systems: Windows, OS X, and Linux. Furthermore, the source
   code  for  building  Rust  is available;  however,  even  some  Unix
   environments  do  not  currently support  Rust  out-of-the-box.  For
-  example,  Rust  can  only  compile   on  FreeBSD  versions  10.x  and
+  example,  Rust  can  only  compile   on  Free-BSD  versions  10.x  and
   above. Nevertheless, since we want DockAlt to run on a Linux system,
   the issue is moot.
 
@@ -229,25 +229,46 @@
 
    Returning to  Petazzoni's criticism of Go's  revision history, Rust
    has  had significant  code-base  changes.  Similarly,  it lacks  an
-   integrated  development  environment.   Finally,  documenation  for
+   integrated  development  environment.   Finally,  documentation  for
    Rust's error handling suggests that subject is dealt with seriously
    by Rust, albeit more verbose than Go.
 
 * Conclusion
-  
-  # Groups of languages
-  
+ 
+  Let us summarize where we stand.  We want to build an alternative to
+  Docker in another programming language,  so that we have the freedom
+  to  choose  the  standard  implementation or  our  alternative  one,
+  DockerAlt.  Our  primary  concerns  for DockerAlt  are  to  maintain
+  container images, run them, record  any changes to these images, and
+  finally push those changes to a repository for version control.
 
-  # What we want
+  Jérôme Petazzoni argued several reasons why the Docker team chose Go
+  for  the development  of a  system with  these requirements:  static
+  compilation,  dependency  issues,   language  features,  development
+  environment, and  multi-architecture support.  We have  examined how
+  Java, Python,  and Rust compare  with Go on these  important issues.
   
-  # Recommendation
+  Java and  Rust both  offer static  compilation, whereas  Python does
+  not. Of the three alternative languages we have considered, only Rust
+  matches Go's dependency approach. Although Java and Python offer
+  low-level interfaces, neither match the abilities of Go or Rust.
+  Java and Python offer many development environment choices; Rust and
+  Go do not.
 
-  # What we get in return
+  If we assume  that the language features the Docker  team has argued
+  are important  for building container  software, then we  argue that
+  Rust  offers the  closest match  to  Go. If  on the  other hand,  we
+  believe that these features are not  as important as having a mature
+  development history and  support network, then Java  and Python seem
+  to  be better  choices.
 
-# Your summary should focus on the technologies' effects on ease of
-# use, flexibility, generality, performance, reliability; thie idea is
-# to explore the most-important technical challenges in doing the
-# proposed rewrite.
+  We  believe  that two  features stand  out:
+  dependency and low-level high-speed  performance. Since what we want
+  are containers  that can run fast  and anywhere, we want  a language
+  that  provides  us   with  the  ability  to   develop  a  concurrent
+  application  that  is  also  as dependency-free  as  possible.  Rust
+  provides us with the tools and approach to achieve both these goals,
+  with the guarantee that our program is memory- and thread-safe.
 
 \bibliographystyle{acm}
 \bibliography{refs}
