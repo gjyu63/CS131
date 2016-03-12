@@ -1,5 +1,5 @@
 #+AUTHOR: Ryan Sharif
-#+TITLE: Homework 6: Containerization support languages
+#+TITLE: Homework 6: DockerAlt, a Docker rewritel
 #+LaTeX_HEADER: \usepackage{minted}
 #+LaTeX_HEADER: \usemintedstyle{emacs}
 #+LATEX_HEADER: \usepackage{amsthm}
@@ -9,17 +9,30 @@
 #+LaTeX_HEADER: \usepackage{mathpazo}
 #+LaTeX_HEADER: \usepackage{hyperref}
 #+LaTeX_HEADER: \linespread{1.05}
-#+LaTex_HEADER: \usepackage{usenix,epsfig,endnotes}
+#+LaTeX_HEADER: \usepackage[letterpaper, margin=1in]{geometry}
 #+LATEX_HEADER: \usepackage{listings}
 #+LATEX_HEADER: \usetikzlibrary{positioning,calc}
 #+LATEX_HEADER: \usepackage{url}
+#+LATEX_HEADER: \usepackage{multicol}
 #+OPTIONS: toc:nil
-#+LaTeX_CLASS_OPTIONS: [letterpaper,twocolumn,10pt]
+#+LaTeX_CLASS_OPTIONS: [letterpaper,10pt]
+
 #+BIBLIOGRAPHY: refs acm
 
 # Abstract
 
+\begin{abstract}
+In  this paper,  we examine  Docker and  the standardization  of Linux
+kernels  through the  use  of system-level  virtualization with  Linux
+containers  to  manage  application deployment.  We  examine  Docker's
+choice of the  programming language Go and  consider three programming
+languages to rewrite our  own implementation, DockerAlt: Java, Python,
+and  Rust.  After  examining  the  challenges  and  benefits  of  each
+language, we conclude and recommend  the Rust programming language for
+this project.
+\end{abstract}
 
+\begin{multicols}{2}
 * Containers
 ** Linux containers (LXC)
    For several  decades, the model  of running software on  a computer
@@ -31,7 +44,7 @@
    
    Initially  released in  2008 \cite{linuxlxc2016},  Linux containers
    (LXC) have become a popular  approach to virtualization. LXC are an
-   alternative to  the virtual  machine approaches, which  emulate the
+   alternative to  the virtual  machine approache, which  emulates the
    hardware of a computer system  through software, e.g., CPU, memory,
    and hard-disks.  LXC, on the other hand, run using a system's Linux
    kernel, which isolates and manages the resources of an application,
@@ -39,7 +52,7 @@
    etc...
    
    Put simply, an  LXC is the marriage between  executing machine code
-   natively and executing  machine code on a virtual  machine, you get
+   natively and executing  machine code on a virtual  machine; you get
    the  benefits  and  isolation  of a  virtual  machine  without  the
    overhead memory and CPU costs.  In other words, a container affords
    developers  the  benefits  of  virtualization  without  a  hardware
@@ -47,9 +60,7 @@
    these core ideas.
 
 ** Docker containers
-   # fix, this should include information about the recent switch
-   # from LXC to runc
-   # http://stackoverflow.com/questions/16047306/how-is-docker-different-from-a-normal-virtual-machine
+
    According   to  their   documentation  \cite{docker:2016},   Docker
    containers  ship  a  piece  of  software  with  a  file-system  with
    everything needed to  run code, runtimes, system  tools, and system
@@ -68,7 +79,7 @@
    Docker is written in  Google's open-source programming language Go,
    which was developed by Robert Griesemer, Rob Pike, and Ken Thompson
    in  2007  \cite{go:2009}.   Go  belongs  to  the  ALGOL  family  of
-   programming languages \cite{ohearn:1996}, thus its syntax resembles
+   programming languages \cite{ohearn:1996}. Thus its syntax resembles
    C  in  many  ways  \cite{go-faq:2016}.   It  is  statically  typed,
    compiled,  allows for  multi-threaded applications,  and includes  a
    garbage collector \cite{go-faq:2016}. Jérôme Petazzoni, a developer
@@ -81,12 +92,12 @@
    thread-safety,   (ii)   revision   issues,   (iii)   multiple-build
    difficulties, (iv)  lack of an integrated  development environment,
    and (v)  error-handling verbosity. We will  ignore (ii) Petazonni's
-   recommendation  for  Go,  based  on  language  neutrality,  largely
-   because we  want to examine other  options, but also because  we do
-   not view language neutrality as  an expensive cost when considering
-   which language is best suited for a project. Throughout the remainder
-   of this paper, we will consider how Java, Python, and Rust align
-   with the features, which Petazonni highlights.    
+   language  neutrality  argument because  we  want  to examine  other
+   options.  Furthermore, we  do not  view language  neutrality as  an
+   expensive cost when considering which language is best suited for a
+   project. Throughout the  remainder of this paper,  we will consider
+   how Java, Python, and Rust align with the features, which Petazonni
+   highlights.
 
 * Java
 ** Benefits comparison with Go
@@ -97,10 +108,12 @@
    Java  has  existed  since   1996  \cite[p.7]{Evans:2014},  a  large
    repertoire of development environments, including several integrated
    development  environments,  e.g.,  Eclipse, Netbeans,  as  well  as
-   light-weight environments like  Microsoft Visual Studio. Petazzoni
-   briefly mentions the  fact that Go can run code  from any C library
-   using /cgo/ to call C functions \cite[s.19]{slideshare:2013}.  Java
-   also     provides    similar     functionality    using     /native
+   light-weight  environments  like  Microsoft  Visual  Studio.  These
+   features contribute, ideally, to an improved workflow for our team,
+   leading to faster and easier development cycles.  Petazzoni briefly
+   mentions the  fact that Go  can run code  from any C  library using
+   /cgo/ to call C  functions \cite[s.19]{slideshare:2013}.  Java also
+   provides       similar       functionality      using       /native
    methods/\cite[p.69]{Evans:2014},   but   are  implicitly   platform
    dependent.
 *** Cross-architecture compatibility
@@ -198,8 +211,8 @@
   \cite[s.26]{slideshare:2013}, in his explanation  for why the Docker
   team chose  Go, asserting that Go  is ``more real than  Rust.'' This
   situation may have been true in  2013, when Petazzoni gave his talk;
-  however, since then  Rust has had an official  release, as explained
-  above.
+  but since then,  Rust has had an official  release, and is just as
+  ``real'' as Go.
 
   Both  languages  share the  fact  that  they are  statically  typed;
   however, Rust does not use  a garbage collector, guaranteeing memory
@@ -264,7 +277,7 @@
 
   We  believe  that two  features stand  out:
   dependency and low-level high-speed  performance. Since what we want
-  are containers  that can run fast  and anywhere, we want  a language
+  are containers  that can run fast anywhere. We want  a language
   that  provides  us   with  the  ability  to   develop  a  concurrent
   application  that  is  also  as dependency-free  as  possible.  Rust
   provides us with the tools and approach to achieve both these goals,
@@ -272,3 +285,4 @@
 
 \bibliographystyle{acm}
 \bibliography{refs}
+\end{multicols}
